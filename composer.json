@@ -1,0 +1,25 @@
+{
+    "name": "megaads/apify",
+    "description": "Dynamic generator for RESTful API",
+    "keywords": [
+        "api",
+        "rest",
+        "microservice",
+        "webservice",
+        "generator"
+    ],
+    "homepage": "https://www.megaads.vn",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "megaads-vn",
+            "email": "info@megaads.vn"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.6.4",
+        "laravel/lumen-framework": "5.4.*"
+    }
+}
