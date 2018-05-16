@@ -183,10 +183,18 @@ class BaseController extends Controller
                     case 'eq':
                         if ($tableAlias != $entity) {
                             $query = $query->whereHas($tableAlias, function ($query) use ($tableAlias, $filter) {
-                                $query = $query->where($tableAlias . '.' . $filter['field'], '=', $filter['value']);
+                                if ($filter['field'] == 'ids') {
+                                    $query = $query->whereIn($tableAlias . '.' . $filter['field'], explode(':', $filter['value']));
+                                } else {
+                                    $query = $query->where($tableAlias . '.' . $filter['field'], '=', $filter['value']);
+                                }
                             });
                         } else {
-                            $query = $query->where($tableAlias . '.' . $filter['field'], '=', $filter['value']);
+                            if ($filter['field'] == 'ids') {
+                                $query = $query->whereIn($tableAlias . '.' . 'id', explode(':', $filter['value']));
+                            } else {
+                                $query = $query->where($tableAlias . '.' . $filter['field'], '=', $filter['value']);
+                            }
                         }
                         break;
                     case 'neq':
