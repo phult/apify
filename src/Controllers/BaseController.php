@@ -92,8 +92,9 @@ class BaseController extends Controller
             '>' => 'gt', // greater
             '<=' => 'lte', // less or equal
             '<' => 'lt', // less
-            '!~' => 'nlike', // like
+            '!~' => 'nlike', // not like
             '~' => 'like', // like
+            '![]' => 'nbw', // not between
             '[]' => 'bw', // between
             '!=' => 'neq', // not equal
             '=' => 'eq', // equal
@@ -134,6 +135,12 @@ class BaseController extends Controller
             return $query->count();
         } else if ($params['metric'] == 'first') {
             return $query->first();
+        } else if ($params['metric'] == 'increment'
+            || $params['metric'] == 'decrement') {
+            if (count($params['fields']) > 0) {
+                $query = $query->$params['metric']($params['fields'][0]);
+            }
+            return $query;
         } else {
             if (array_key_exists('page_size', $params['pagination'])
                 && array_key_exists('page_id', $params['pagination'])
@@ -182,10 +189,18 @@ class BaseController extends Controller
                     case 'eq':
                         if ($tableAlias != $entity) {
                             $query = $query->whereHas($tableAlias, function ($query) use ($tableAlias, $filter) {
-                                $query = $query->where($tableAlias . '.' . $filter['field'], '=', $filter['value']);
+                                if ($filter['field'] == 'ids') {
+                                    $query = $query->whereIn($tableAlias . '.' . $filter['field'], explode(':', $filter['value']));
+                                } else {
+                                    $query = $query->where($tableAlias . '.' . $filter['field'], '=', $filter['value']);
+                                }
                             });
                         } else {
-                            $query = $query->where($tableAlias . '.' . $filter['field'], '=', $filter['value']);
+                            if ($filter['field'] == 'ids') {
+                                $query = $query->whereIn($tableAlias . '.' . 'id', explode(':', $filter['value']));
+                            } else {
+                                $query = $query->where($tableAlias . '.' . $filter['field'], '=', $filter['value']);
+                            }
                         }
                         break;
                     case 'neq':
@@ -236,28 +251,37 @@ class BaseController extends Controller
                     case 'bw':
                         if ($tableAlias != $entity) {
                             $query = $query->whereHas($tableAlias, function ($query) use ($tableAlias, $filter) {
-                                $query = $query->whereBetween($tableAlias . '.' . $filter['field'], $filter['value']);
+                                $query = $query->whereBetween($tableAlias . '.' . $filter['field'], explode(':', $filter['value']));
                             });
                         } else {
-                            $query = $query->whereBetween($tableAlias . '.' . $filter['field'], $filter['value']);
+                            $query = $query->whereBetween($tableAlias . '.' . $filter['field'], explode(':', $filter['value']));
+                        }
+                        break;
+                    case 'nbw':
+                        if ($tableAlias != $entity) {
+                            $query = $query->whereHas($tableAlias, function ($query) use ($tableAlias, $filter) {
+                                $query = $query->whereNotBetween($tableAlias . '.' . $filter['field'], explode(':', $filter['value']));
+                            });
+                        } else {
+                            $query = $query->whereNotBetween($tableAlias . '.' . $filter['field'], explode(':', $filter['value']));
                         }
                         break;
                     case 'in':
                         if ($tableAlias != $entity) {
                             $query = $query->whereHas($tableAlias, function ($query) use ($tableAlias, $filter) {
-                                $query = $query->whereIn($tableAlias . '.' . $filter['field'], $filter['value']);
+                                $query = $query->whereIn($tableAlias . '.' . $filter['field'], explode(':', $filter['value']));
                             });
                         } else {
-                            $query = $query->whereIn($tableAlias . '.' . $filter['field'], $filter['value']);
+                            $query = $query->whereIn($tableAlias . '.' . $filter['field'], explode(':', $filter['value']));
                         }
                         break;
                     case 'nin':
                         if ($tableAlias != $entity) {
                             $query = $query->whereHas($tableAlias, function ($query) use ($tableAlias, $filter) {
-                                $query = $query->whereNotIn($tableAlias . '.' . $filter['field'], $filter['value']);
+                                $query = $query->whereNotIn($tableAlias . '.' . $filter['field'], explode(':', $filter['value']));
                             });
                         } else {
-                            $query = $query->whereNotIn($tableAlias . '.' . $filter['field'], $filter['value']);
+                            $query = $query->whereNotIn($tableAlias . '.' . $filter['field'], explode(':', $filter['value']));
                         }
                         break;
                     case 'like':
