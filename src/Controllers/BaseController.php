@@ -1,8 +1,8 @@
 <?php
 namespace Megaads\Apify\Controllers;
 
-use Megaads\Apify\Models\BaseModel;
 use Laravel\Lumen\Routing\Controller;
+use Megaads\Apify\Models\BaseModel;
 
 class BaseController extends Controller
 {
@@ -31,7 +31,7 @@ class BaseController extends Controller
             'fields' => [],
             'embeds' => [],
             'filters' => [],
-            'groups' => []
+            'groups' => [],
         ];
         // pagination
         if ($request->has('page_id')) {
@@ -199,7 +199,11 @@ class BaseController extends Controller
                             if ($filter['field'] == 'ids') {
                                 $query = $query->whereIn($tableAlias . '.' . 'id', explode(':', $filter['value']));
                             } else {
-                                $query = $query->where($tableAlias . '.' . $filter['field'], '=', $filter['value']);
+                                if (strtolower($filter['value']) == 'null') {
+                                    $query = $query->whereNull($tableAlias . '.' . $filter['field']);
+                                } else {
+                                    $query = $query->where($tableAlias . '.' . $filter['field'], '=', $filter['value']);
+                                }
                             }
                         }
                         break;
@@ -209,7 +213,11 @@ class BaseController extends Controller
                                 $query = $query->where($tableAlias . '.' . $filter['field'], '<>', $filter['value']);
                             });
                         } else {
-                            $query = $query->where($tableAlias . '.' . $filter['field'], '<>', $filter['value']);
+                            if (strtolower($filter['value']) == 'null') {
+                                $query = $query->whereNotNull($tableAlias . '.' . $filter['field']);
+                            } else {
+                                $query = $query->where($tableAlias . '.' . $filter['field'], '<>', $filter['value']);
+                            }
                         }
                         break;
                     case 'gt':
