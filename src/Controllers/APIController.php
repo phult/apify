@@ -16,7 +16,8 @@ class APIController extends BaseController
         $model = $this->buildFilterQuery($model, $queryParams['filters'], $entity);
         $model = $this->buildGroupQuery($model, $queryParams['groups'], $entity);
         $model = $this->buildEmbedQuery($model, $queryParams['embeds'], $entity);
-        if ($queryParams['metric'] == 'count') {
+        if ($queryParams['metric'] == 'count'
+            || $queryParams['metric'] == 'first') {
             $response['result'] = $this->fetchData($model, $queryParams);
         } else {
             $response['meta'] = $this->fetchMetaData($model, $queryParams);

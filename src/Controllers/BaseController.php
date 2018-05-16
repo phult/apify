@@ -8,7 +8,8 @@ class BaseController extends Controller
 {
     protected function getModel($entity)
     {
-        $entityClass = getenv('APP_MODEL_NAMESPACE', 'App\Models') . '\\' . str_replace('_', '', ucwords($entity, '_'));
+        $modelNameSpace = getenv('APP_MODEL_NAMESPACE');
+        $entityClass = ($modelNameSpace != null ? $modelNameSpace : 'App\Models') . '\\' . str_replace('_', '', ucwords($entity, '_'));
         if (class_exists($entityClass)) {
             $retval = new $entityClass;
         } else {
@@ -21,7 +22,7 @@ class BaseController extends Controller
     protected function buildQueryParams($request, $entity)
     {
         $retval = [
-            'metric' => 'fetch',
+            'metric' => 'get',
             'pagination' => [
                 'page_size' => 50,
                 'page_id' => 0,
@@ -131,6 +132,8 @@ class BaseController extends Controller
     {
         if ($params['metric'] == 'count') {
             return $query->count();
+        } else if ($params['metric'] == 'first') {
+            return $query->first();
         } else {
             if (array_key_exists('page_size', $params['pagination'])
                 && array_key_exists('page_id', $params['pagination'])
@@ -287,12 +290,12 @@ class BaseController extends Controller
     {
         if ($selections != null && count($selections) > 0) {
             foreach ($selections as $selection) {
-                if (preg_match("/^count()/", $selection)
-                    || preg_match("/^sum()/", $selection)
-                    || preg_match("/^max()/", $selection)
-                    || preg_match("/^min()/", $selection)
-                    || preg_match("/^avg()/", $selection)) {
-                    $query = $query->addSelect(DB::raw($selection));
+                if (preg_match("/^count/", $selection)
+                    || preg_match("/^sum/", $selection)
+                    || preg_match("/^max/", $selection)
+                    || preg_match("/^min/", $selection)
+                    || preg_match("/^avg/", $selection)) {
+                    $query = $query->addSelect(\DB::raw($selection));
                 } else {
                     if (str_contains($selection, '.')) {
                         $query = $query->addSelect($selection);
