@@ -30,6 +30,7 @@ class BaseController extends Controller
             'fields' => [],
             'embeds' => [],
             'filters' => [],
+            'groups' => []
         ];
         // pagination
         if ($request->has('page_id')) {
@@ -53,6 +54,15 @@ class BaseController extends Controller
             foreach ($embeds as $embed) {
                 if ($embed != null) {
                     $retval['embeds'][] = $embed;
+                }
+            }
+        }
+        // groups
+        if ($request->has('groups')) {
+            $groups = explode(',', $request->input('groups'));
+            foreach ($groups as $group) {
+                if ($group != null) {
+                    $retval['groups'][] = $group;
                 }
             }
         }
@@ -293,6 +303,20 @@ class BaseController extends Controller
             }
         } else {
             $query = $query->select(array($tableAlias ? $tableAlias . '.*' : '*'));
+        }
+        return $query;
+    }
+
+    protected function buildGroupQuery($query, $groups, $tableAlias = null)
+    {
+        if ($groups != null && count($groups) > 0) {
+            foreach ($groups as $group) {
+                if (str_contains($group, '.')) {
+                    $query = $query->groupBy($group);
+                } else {
+                    $query = $query->groupBy(($tableAlias ? $tableAlias . '.' : '') . $group);
+                }
+            }
         }
         return $query;
     }
