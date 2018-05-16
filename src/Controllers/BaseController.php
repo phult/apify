@@ -135,6 +135,12 @@ class BaseController extends Controller
             return $query->count();
         } else if ($params['metric'] == 'first') {
             return $query->first();
+        } else if ($params['metric'] == 'increment'
+            || $params['metric'] == 'decrement') {
+            if (count($params['fields']) > 0) {
+                $query = $query->$params['metric']($params['fields'][0]);
+            }
+            return $query;
         } else {
             if (array_key_exists('page_size', $params['pagination'])
                 && array_key_exists('page_id', $params['pagination'])
