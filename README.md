@@ -1,6 +1,6 @@
 # Apify
 
-A RESTful API dynamic generator in order to help develpers to create RESTful API service lightly, quickly and flexible
+A RESTful API dynamic generator in order to help developers to create RESTful API service lightly, quickly and flexible
 
 ## Features
 
