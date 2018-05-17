@@ -1,18 +1,18 @@
 # Apify
 
-A RESTful API dynamic generator in order to help developers to create RESTful API service lightly, quickly and flexible
+A RESTful API dynamic generator in order to help developers to create RESTful APIs quickly and it's flexible even free code
 
 ## Features
 
-* Generates RESTful API for MySql database
+* Generates RESTful APIs for MySql database
   * Pagination 
   * Sorting
-  * Selection - Column, SQL Aggregate function
+  * Selection - Columns, SQL Aggregate functions
   * Groups
-  * Filtering - Row, Relationships
+  * Filtering - Rows, Relationships
   * Relationships
-  * Meta-data response
-  * Message communication
+  * Metrics
+  * Data change message channel
 
 Use HTTP clients like [Postman](https://www.getpostman.com/) or [similar tools](https://chrome.google.com/webstore/search/http%20client?_category=apps) to invoke RESTful API calls
 
