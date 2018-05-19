@@ -41,19 +41,39 @@ class APIController extends BaseController
 
     public function store($entity, Request $request)
     {
-        $result = null;
+        $result = [];
+        $status = "successful";
         $model = $this->getModel($entity);
-        $attributes = $request->all();
+        $inputs = $request->all();
         try {
-            $result = $model->create($attributes);
+            if (isset($inputs[0]) && is_array($inputs[0])) {
+                \DB::beginTransaction();
+                try {
+                    foreach ($inputs as $input) {
+                        $result[] = $model->create($input);
+                    }
+                    \DB::commit();
+                } catch (\Exception $exc) {
+                    $status = "fail";
+                    $result = $exc->getMessage();
+                    \DB::rollback();
+                }
+            } else {
+                $result = $model->create($inputs);
+            }
         } catch (\Exception $exc) {
+            $status = "fail";
+            $result = $exc->getMessage();
+        }
+        if ($status == "successful") {
+            return $this->success([
+                'result' => $result,
+            ]);
+        } else {
             return $this->error([
-                'result' => $exc->getMessage()
+                'result' => $result,
             ]);
         }
-        return $this->success([
-            'result' => $result
-        ]);
     }
 
     public function update($entity, $id, Request $request)
