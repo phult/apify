@@ -32,6 +32,7 @@ class APIController extends BaseController
     {
         $queryParams = $this->buildQueryParams($request, $entity);
         $model = $this->getModel($entity);
+        $model = $this->buildSelectionQuery($model, $queryParams['fields'], $entity);
         $model = $this->buildEmbedQuery($model, $queryParams['embeds'], $entity);
         $result = $model->find($id);
         return $this->success([

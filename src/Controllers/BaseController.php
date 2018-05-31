@@ -2,10 +2,12 @@
 namespace Megaads\Apify\Controllers;
 
 use Laravel\Lumen\Routing\Controller;
+use Megaads\Apify\FilterBuilders\FilterBuilderManagement;
 use Megaads\Apify\Models\BaseModel;
 
 class BaseController extends Controller
 {
+
     protected function getModel($entity)
     {
         $modelNameSpace = getenv('APP_MODEL_NAMESPACE');
@@ -85,47 +87,7 @@ class BaseController extends Controller
             }
         }
         // filters
-        $filterOperators = [
-            '!<>' => 'nin', // not in
-            '<>' => 'in', // in
-            '>=' => 'gte', // greater or equal
-            '>' => 'gt', // greater
-            '<=' => 'lte', // less or equal
-            '<' => 'lt', // less
-            '!~' => 'nlike', // not like
-            '~' => 'like', // like
-            '![]' => 'nbw', // not between
-            '[]' => 'bw', // between
-            '!=' => 'neq', // not equal
-            '=' => 'eq', // equal
-        ];
-        if ($request->has('filters')) {
-            $filters = explode(',', $request->input('filters'));
-            foreach ($filters as $filter) {
-                if ($filter != null) {
-                    foreach ($filterOperators as $key => $value) {
-                        $operator = explode($key, $filter);
-                        if (count($operator) == 2) {
-                            $operatorRelation = explode('.', $operator[0]);
-                            if (count($operatorRelation) == 2) {
-                                $retval['filters'][$operatorRelation[0]][] = [
-                                    'field' => $operatorRelation[1],
-                                    'operator' => $value,
-                                    'value' => $operator[1],
-                                ];
-                            } else if (count($operatorRelation) == 1) {
-                                $retval['filters'][$entity][] = [
-                                    'field' => $operator[0],
-                                    'operator' => $value,
-                                    'value' => $operator[1],
-                                ];
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
-        }
+        $retval['filters'] = FilterBuilderManagement::getInstance()->buildQueryParams($request, $entity);
         return $retval;
     }
 
@@ -156,20 +118,29 @@ class BaseController extends Controller
     {
         $params['metric'] = 'count';
         $count = $this->fetchData($query, $params);
-        $pageSize = $params['pagination']['page_size'];
-        $pageId = $params['pagination']['page_id'] + 1;
-        $pageCount = ceil($count / $pageSize);
+        $pageSize = -1;
+        $pageId = -1;
+        $pageCount = 1;
         $hasNext = true;
-        if ($pageId >= $pageCount) {
-            $hasNext = false;
+        $offSet = 0;
+        if ($params['pagination']['page_size'] >= 0
+            && $params['pagination']['page_id'] >= 0) {
+            $pageSize = $params['pagination']['page_size'];
+            $pageId = $params['pagination']['page_id'];
+            $pageCount = ceil($count / $pageSize);
+            $hasNext = true;
+            if ($pageId + 1 >= $pageCount) {
+                $hasNext = false;
+            }
+            $offSet = ($pageId) * $pageSize;
         }
         return [
             'has_next' => $hasNext,
             'total_count' => $count,
             'page_count' => $pageCount,
             'page_size' => (int) $pageSize,
-            'page_id' => (int) $pageId - 1,
-            'off_set' => ($pageId - 1) * $pageSize,
+            'page_id' => (int) $pageId,
+            'off_set' => $offSet,
         ];
     }
 
@@ -183,139 +154,7 @@ class BaseController extends Controller
 
     protected function buildFilterQuery($query, $filters, $entity)
     {
-        foreach ($filters as $tableAlias => $entityFilters) {
-            foreach ($entityFilters as $filter) {
-                switch ($filter['operator']) {
-                    case 'eq':
-                        if ($tableAlias != $entity) {
-                            $query = $query->whereHas($tableAlias, function ($query) use ($tableAlias, $filter) {
-                                if ($filter['field'] == 'ids') {
-                                    $query = $query->whereIn($tableAlias . '.' . $filter['field'], explode(':', $filter['value']));
-                                } else {
-                                    $query = $query->where($tableAlias . '.' . $filter['field'], '=', $filter['value']);
-                                }
-                            });
-                        } else {
-                            if ($filter['field'] == 'ids') {
-                                $query = $query->whereIn($tableAlias . '.' . 'id', explode(':', $filter['value']));
-                            } else {
-                                if (strtolower($filter['value']) == 'null') {
-                                    $query = $query->whereNull($tableAlias . '.' . $filter['field']);
-                                } else {
-                                    $query = $query->where($tableAlias . '.' . $filter['field'], '=', $filter['value']);
-                                }
-                            }
-                        }
-                        break;
-                    case 'neq':
-                        if ($tableAlias != $entity) {
-                            $query = $query->whereHas($tableAlias, function ($query) use ($tableAlias, $filter) {
-                                $query = $query->where($tableAlias . '.' . $filter['field'], '<>', $filter['value']);
-                            });
-                        } else {
-                            if (strtolower($filter['value']) == 'null') {
-                                $query = $query->whereNotNull($tableAlias . '.' . $filter['field']);
-                            } else {
-                                $query = $query->where($tableAlias . '.' . $filter['field'], '<>', $filter['value']);
-                            }
-                        }
-                        break;
-                    case 'gt':
-                        if ($tableAlias != $entity) {
-                            $query = $query->whereHas($tableAlias, function ($query) use ($tableAlias, $filter) {
-                                $query = $query->where($tableAlias . '.' . $filter['field'], '>', $filter['value']);
-                            });
-                        } else {
-                            $query = $query->where($tableAlias . '.' . $filter['field'], '>', $filter['value']);
-                        }
-                        break;
-                    case 'gte':
-                        if ($tableAlias != $entity) {
-                            $query = $query->whereHas($tableAlias, function ($query) use ($tableAlias, $filter) {
-                                $query = $query->where($tableAlias . '.' . $filter['field'], '>=', $filter['value']);
-                            });
-                        } else {
-                            $query = $query->where($tableAlias . '.' . $filter['field'], '>=', $filter['value']);
-                        }
-                        break;
-                    case 'lt':
-                        if ($tableAlias != $entity) {
-                            $query = $query->whereHas($tableAlias, function ($query) use ($tableAlias, $filter) {
-                                $query = $query->where($tableAlias . '.' . $filter['field'], '<', $filter['value']);
-                            });
-                        } else {
-                            $query = $query->where($tableAlias . '.' . $filter['field'], '<', $filter['value']);
-                        }
-                        break;
-                    case 'lte':
-                        if ($tableAlias != $entity) {
-                            $query = $query->whereHas($tableAlias, function ($query) use ($tableAlias, $filter) {
-                                $query = $query->where($tableAlias . '.' . $filter['field'], '<=', $filter['value']);
-                            });
-                        } else {
-                            $query = $query->where($tableAlias . '.' . $filter['field'], '<=', $filter['value']);
-                        }
-                        break;
-                    case 'bw':
-                        if ($tableAlias != $entity) {
-                            $query = $query->whereHas($tableAlias, function ($query) use ($tableAlias, $filter) {
-                                $query = $query->whereBetween($tableAlias . '.' . $filter['field'], explode(':', $filter['value']));
-                            });
-                        } else {
-                            $query = $query->whereBetween($tableAlias . '.' . $filter['field'], explode(':', $filter['value']));
-                        }
-                        break;
-                    case 'nbw':
-                        if ($tableAlias != $entity) {
-                            $query = $query->whereHas($tableAlias, function ($query) use ($tableAlias, $filter) {
-                                $query = $query->whereNotBetween($tableAlias . '.' . $filter['field'], explode(':', $filter['value']));
-                            });
-                        } else {
-                            $query = $query->whereNotBetween($tableAlias . '.' . $filter['field'], explode(':', $filter['value']));
-                        }
-                        break;
-                    case 'in':
-                        if ($tableAlias != $entity) {
-                            $query = $query->whereHas($tableAlias, function ($query) use ($tableAlias, $filter) {
-                                $query = $query->whereIn($tableAlias . '.' . $filter['field'], explode(':', $filter['value']));
-                            });
-                        } else {
-                            $query = $query->whereIn($tableAlias . '.' . $filter['field'], explode(':', $filter['value']));
-                        }
-                        break;
-                    case 'nin':
-                        if ($tableAlias != $entity) {
-                            $query = $query->whereHas($tableAlias, function ($query) use ($tableAlias, $filter) {
-                                $query = $query->whereNotIn($tableAlias . '.' . $filter['field'], explode(':', $filter['value']));
-                            });
-                        } else {
-                            $query = $query->whereNotIn($tableAlias . '.' . $filter['field'], explode(':', $filter['value']));
-                        }
-                        break;
-                    case 'like':
-                        if ($tableAlias != $entity) {
-                            $query = $query->whereHas($tableAlias, function ($query) use ($tableAlias, $filter) {
-                                $query = $query->where($tableAlias . '.' . $filter['field'], 'LIKE', '%' . $filter['value'] . '%');
-                            });
-                        } else {
-                            $query = $query->where($tableAlias . '.' . $filter['field'], 'LIKE', '%' . $filter['value'] . '%');
-                        }
-                        break;
-                    case 'nlike':
-                        if ($tableAlias != $entity) {
-                            $query = $query->whereHas($tableAlias, function ($query) use ($tableAlias, $filter) {
-                                $query = $query->where($tableAlias . '.' . $filter['field'], 'NOT LIKE', $filter['value']);
-                            });
-                        } else {
-                            $query = $query->where($tableAlias . '.' . $filter['field'], 'NOT LIKE', $filter['value']);
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-        return $query;
+        return FilterBuilderManagement::getInstance()->buildQuery($query, $filters, $entity);
     }
 
     protected function buildSelectionQuery($query, $selections, $tableAlias = null)
