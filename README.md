@@ -4,7 +4,7 @@ A RESTful API library in order to help developers to create RESTful API services
 
 It's always easy to customize to suit any need such as define data relationships, modify/ create new APIs, communicate or integrate into other systems.
 
-It's pretty!
+And it's pretty!
 
 ## Features
 
@@ -45,77 +45,12 @@ Apify is packed as a composer package. So it's installed quickly in 2 steps
 |-------------|----------------------------------|--------------------------------------------------------- 
 | GET         | /api/table_name                  | List all rows of table                                 | 
 | GET         | /api/table_name/:id              | Retrieve a row by primary key :id                      |
-| POST        | /api/table_name                  | Create a new row                                       |
+| POST        | /api/table_name                  | Insert a new row, bulk insertion is also avaiable                                       |
 | PUT         | /api/table_name/:id              | Replaces existed row with new one                      |
 | PATCH       | /api/table_name/:id              | Update row element by primary key                      |
 | DELETE      | /api/table_name/:id              | Delete a row by primary key                            |
 
-## Metric
-
-### metric=get (default): Retrieve all results that match the query
-
-For example
-
-```
-/api/post or
-```
-or
-
-```
-/api/post?metric=get
-```
-
-Retrieved results
-
-```json
-{
-    "meta": {
-        "has_next": true,
-        "total_count": 100,
-        "page_count": 2,
-        "page_size": 50,
-        "page_id": 0
-    },
-    "results": [],
-    "status": "successful"
-}
-```
-
-### metric=first: Retrieve the first result that match the query
-
-For example
-
-```
-/api/post?metric=first
-```
-
-Retrieved results
-
-```json
-{    
-    "results": {},
-    "status": "successful"
-}
-```
-
-### metric=count: Retrieve the number of results that match the query
-
-For example
-
-```
-/api/post?metric=count
-```
-
-Retrieved results
-
-```json
-{    
-    "results": 50,
-    "status": "successful"
-}
-```
-
-## Pagination
+## Pagination: `?page_size= &page_id=`
 
 | Parameter   | Required    | Default    | Description                                                      |
 |-------------|-------------|------------|------------------------------------------------------------------|
@@ -126,7 +61,7 @@ Retrieved results
 /api/post?page_id=2&page_size=20
 ```
 
-## Sorting
+## Sorting `?sorts=`
 
 Order by multiple columns using **`sorts`** parameter
 
@@ -148,7 +83,7 @@ Order by multiple columns using **`sorts`** parameter
 /api/post?sorts=user_id,-created_at
 ```
 
-## Selection
+## Selection: `?fields=`
 
 Select columns from the results using **`fields`** parameter. SQL aggregate functions such as `COUNT`, `MAX`, `MIN`, `SUM`, `AVG`, SQL aliases are also available
 
@@ -156,7 +91,7 @@ Select columns from the results using **`fields`** parameter. SQL aggregate func
 /api/post?fields=id,content,user_id,sum(view_count) as view_sum
 ```
 
-## Group By
+## Group By: `?groups=`
 
 Group the result-set by one or more columns using **`groups`** parameter and combine with aggregate functions using `Selection`
 
@@ -164,7 +99,7 @@ Group the result-set by one or more columns using **`groups`** parameter and com
 /api/post?fields=user_id,sum(view_count)&groups=user_id
 ```
 
-## Filtering
+## Filtering: `?filters=`
 
 | Operator   | Condition          |  For example                                         
 |--------------|--------------------|----------------------------------
@@ -184,7 +119,7 @@ Group the result-set by one or more columns using **`groups`** parameter and com
 Apify supports filtering records based on more than one `AND` condition by using comma. For example: 
 
 ```
-/api/post?fields=user_id=1,status={enabled;pending},tile~hello
+/api/post?filters=user_id=1,status={enabled;pending},tile~hello,view_count!=null
 ```
 
 Complex conditions that combine `AND`, `OR` and `NOT` will be available soon.
@@ -195,16 +130,18 @@ Apify is packed into a `Laravel`/ `Lumen` package so relationships also are defi
 
 See Laravel docs for details: https://laravel.com/docs/5.6/eloquent-relationships
 
-Let's consider relationship defination:
+Let's consider the following relationship definations:
 
 - A `Nation` has many `City` (one-to-many relationship)
 
 ```php
 namespace App\Models;
-class Nation extends \Apify\Models\BaseModel
+class Nation extends \Apify\Models\BaseModel {
+    protected $table = 'nation';
     public function cities() {
         return $this->hasMany('App\Models\City', 'nation_id', id);
     }
+}
 ```
 
 - A `City` belongs to a `Nation` (many-to-one relationship)
@@ -212,23 +149,27 @@ class Nation extends \Apify\Models\BaseModel
 
 ```php
 namespace App\Models;
-class City extends \Apify\Models\BaseModel
+class City extends \Apify\Models\BaseModel {
+    protected $table = 'city';
     public function nation() {
         return $this->belongsTo('App\Models\Nation', 'nation_id');
     }
     public function districts() {
         return $this->hasMany('App\Models\District', 'city_id', id);
     }
+}
 ```
 
 - A `District` belongs to a `City` (many-to-one relationship)
 
 ```php
 namespace App\Models;
-class District extends \Apify\Models\BaseModel
+class District extends \Apify\Models\BaseModel {
+    protected $table = 'district';
     public function city() {
         return $this->belongsTo('App\Models\City', 'city_id');
     }
+}    
 ```
 
 Apify provides the ability to embed relational data into the results using `embeds` parameter
@@ -267,6 +208,81 @@ instead of
 
 ```
 /api/city?filters=nation_id=1
+```
+
+## Metric: `?metric=`
+
+### ?metric=get (default): Retrieve all results that match the query
+
+```
+/api/post
+```
+or
+
+```
+/api/post?metric=get
+```
+
+Result format
+
+```json
+{
+    "meta": {
+        "has_next": true,
+        "total_count": 100,
+        "page_count": 2,
+        "page_size": 50,
+        "page_id": 0
+    },
+    "results": [],
+    "status": "successful"
+}
+```
+
+### ?metric=first: Retrieve the first result that matchs the query
+
+
+```
+/api/post?metric=first
+```
+
+Result format
+
+```json
+{    
+    "results": {},
+    "status": "successful"
+}
+```
+
+### ?metric=count: Retrieve the number of results that match the query
+
+```
+/api/post?metric=count
+```
+
+Result format
+
+```json
+{    
+    "results": 50,
+    "status": "successful"
+}
+```
+
+### ?metric=increment / decrement: Pprovides convenient methods for incrementing or decrementing the value of a selected columns
+
+```
+/api/post?metric=increment&fields=view_count
+```
+
+Result format
+
+```json
+{    
+    "results": 1,
+    "status": "successful"
+}
 ```
 
 ## License
