@@ -45,7 +45,7 @@ Apify is packed as a composer package. So it's installed quickly in 2 steps
 |-------------|----------------------------------|--------------------------------------------------------- 
 | GET         | /api/table_name                  | List all rows of table                                 | 
 | GET         | /api/table_name/:id              | Retrieve a row by primary key :id                      |
-| POST        | /api/table_name                  | Create a new row                                       |
+| POST        | /api/table_name                  | Insert a new row, bulk insertion is also avaiable                                       |
 | PUT         | /api/table_name/:id              | Replaces existed row with new one                      |
 | PATCH       | /api/table_name/:id              | Update row element by primary key                      |
 | DELETE      | /api/table_name/:id              | Delete a row by primary key                            |
@@ -119,7 +119,7 @@ Group the result-set by one or more columns using **`groups`** parameter and com
 Apify supports filtering records based on more than one `AND` condition by using comma. For example: 
 
 ```
-/api/post?filters=user_id=1,status={enabled;pending},tile~hello
+/api/post?filters=user_id=1,status={enabled;pending},tile~hello,view_count!=null
 ```
 
 Complex conditions that combine `AND`, `OR` and `NOT` will be available soon.
