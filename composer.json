@@ -6,7 +6,9 @@
         "rest",
         "microservice",
         "webservice",
-        "generator"
+        "api generator",
+        "lumen",
+        "laravel"
     ],
     "homepage": "https://www.megaads.vn",
     "license": "MIT",
@@ -15,6 +17,10 @@
         {
             "name": "megaads-vn",
             "email": "info@megaads.vn"
+        },
+        {
+            "name": "phuluong",
+            "email": "phult.contact@gmail.vn"
         }
     ],
     "require": {
