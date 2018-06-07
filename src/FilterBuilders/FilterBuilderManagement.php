@@ -82,13 +82,15 @@ class FilterBuilderManagement
             $tableAlias = $entity;
             $fieldExp = explode('.', $filter['field']);
             if (count($fieldExp) == 1) {
-                $field = $entity . '.' . $field;
+                $filter['field'] = $entity . '.' . $field;
             } else if (count($fieldExp) == 2) {
                 $tableAlias = $fieldExp[0];
+                $field = $fieldExp[1];
             }
             $builder = $this->getBuilder($operator);
             if ($builder != null) {
                 if ($tableAlias != $entity) {
+                    $filter['field'] = $field;
                     $query = $query->whereHas($tableAlias, function ($query) use ($filter, $builder) {
                         $query = $builder->buildQuery($query, $filter);
                     });
