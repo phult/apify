@@ -1,10 +1,8 @@
 # Apify
 
-A RESTful API library in order to help developers to create RESTful API services lightly, quickly even without writing code.
+A pretty library in order to help developers to create `RESTful API services` lightly, quickly even without writing code.
 
 It's always easy to customize to suit any need such as define data relationships, modify/ create new APIs, communicate or integrate into other systems.
-
-And it's pretty!
 
 ## Features
 
@@ -50,7 +48,7 @@ Apify is packed as a composer package. So it's installed quickly in 2 steps
 | PATCH       | /api/table_name/:id              | Update row element by primary key                      |
 | DELETE      | /api/table_name/:id              | Delete a row by primary key                            |
 
-## Pagination: `?page_size= &page_id=`
+## Pagination (`?page_size= &page_id=`)
 
 | Parameter   | Required    | Default    | Description                                                      |
 |-------------|-------------|------------|------------------------------------------------------------------|
@@ -61,7 +59,7 @@ Apify is packed as a composer package. So it's installed quickly in 2 steps
 /api/post?page_id=2&page_size=20
 ```
 
-## Sorting `?sorts=`
+## Sorting (`?sorts=`)
 
 Order by multiple columns using **`sorts`** parameter
 
@@ -83,7 +81,7 @@ Order by multiple columns using **`sorts`** parameter
 /api/post?sorts=user_id,-created_at
 ```
 
-## Selection: `?fields=`
+## Selection (`?fields=`)
 
 Select columns from the results using **`fields`** parameter. SQL aggregate functions such as `COUNT`, `MAX`, `MIN`, `SUM`, `AVG`, SQL aliases are also available
 
@@ -91,7 +89,7 @@ Select columns from the results using **`fields`** parameter. SQL aggregate func
 /api/post?fields=id,content,user_id,sum(view_count) as view_sum
 ```
 
-## Group By: `?groups=`
+## Group By (`?groups=`)
 
 Group the result-set by one or more columns using **`groups`** parameter and combine with aggregate functions using `Selection`
 
@@ -99,7 +97,7 @@ Group the result-set by one or more columns using **`groups`** parameter and com
 /api/post?fields=user_id,sum(view_count)&groups=user_id
 ```
 
-## Filtering: `?filters=`
+## Filtering (`?filters=`)
 
 | Operator   | Condition          |  For example                                         
 |--------------|--------------------|----------------------------------
@@ -172,6 +170,7 @@ class District extends \Apify\Models\BaseModel {
 }    
 ```
 
+### Selection on relationships
 Apify provides the ability to embed relational data into the results using `embeds` parameter
 
 For example
@@ -198,19 +197,13 @@ Even nested relationships
 /api/district?embeds=city.nation
 ```
 
-Filtering on relationships
+### Filtering on relationships
 
 ```
-/api/city?filters=nation.id=1
+/api/city?filters=nation.location_code=EU,districts.name~land
 ```
 
-instead of
-
-```
-/api/city?filters=nation_id=1
-```
-
-## Metric: `?metric=`
+## Metric (`?metric=`)
 
 ### ?metric=get (default): Retrieve all results that match the query
 
