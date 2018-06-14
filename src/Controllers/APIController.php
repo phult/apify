@@ -11,8 +11,8 @@ class APIController extends BaseController
         $response = [];
         $queryParams = $this->buildQueryParams($request, $entity);
         $model = $this->getModel($entity);
-        $model = $this->buildSelectionQuery($model, $queryParams['fields'], $entity);        
-        $model = $this->buildEmbedQuery($model, $queryParams['embeds'], $entity);        
+        $model = $this->buildSelectionQuery($model, $queryParams['fields'], $entity);
+        $model = $this->buildEmbedQuery($model, $queryParams['embeds'], $entity);
         $model = $this->buildSortQuery($model, $queryParams['sorts'], $entity);
         $model = $this->buildFilterQuery($model, $queryParams['filters'], $entity);
         $model = $this->buildGroupQuery($model, $queryParams['groups'], $entity);
@@ -122,5 +122,15 @@ class APIController extends BaseController
         return $this->success([
             'result' => $result,
         ]);
+    }
+    public function destroyBulk($entity, Request $request)
+    {
+        $response = [];
+        $queryParams = $this->buildQueryParams($request, $entity);
+        $model = $this->getModel($entity);
+        $model = $this->buildEmbedQuery($model, $queryParams['embeds'], $entity);
+        $model = $this->buildFilterQuery($model, $queryParams['filters'], $entity);
+        $response['result'] = $model->delete();
+        return $this->success($response);
     }
 }
