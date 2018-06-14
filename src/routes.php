@@ -18,4 +18,7 @@ $this->app->group(['prefix' => 'api'], function ($router) {
     $router->delete('{entity}/{id}', [
         'uses' => 'Megaads\Apify\Controllers\APIController@destroy',
     ]);
+    $router->delete('{entity}', [
+        'uses' => 'Megaads\Apify\Controllers\APIController@destroyBulk',
+    ]);
 });
