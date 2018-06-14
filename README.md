@@ -18,7 +18,7 @@ It's always easy to customize to suit any need such as define data relationships
 
 Use HTTP clients like [Postman](https://www.getpostman.com/) to invoke RESTful API calls.
 
-Combining with [API Gateway](https://github.com/megaads-vn/api-gateway) is also recommended to build a completely development environment for microservice.
+Combine with [API Gateway](https://github.com/megaads-vn/api-gateway) is also recommended to build a completely development environment for microservice.
 
 ## Installation
 
@@ -41,12 +41,13 @@ Apify is packed as a composer package. So it's installed quickly in 2 steps
 
 | HTTP Method | API URL                          | Description                                            |
 |-------------|----------------------------------|--------------------------------------------------------- 
-| GET         | /api/table_name                  | List all rows of table                                 | 
+| GET         | /api/table_name                  | List all rows of table that match the query                                 | 
 | GET         | /api/table_name/:id              | Retrieve a row by primary key :id                      |
 | POST        | /api/table_name                  | Insert a new row, bulk insertion is also avaiable                                       |
 | PUT         | /api/table_name/:id              | Replaces existed row with new one                      |
 | PATCH       | /api/table_name/:id              | Update row element by primary key                      |
 | DELETE      | /api/table_name/:id              | Delete a row by primary key                            |
+| DELETE      | /api/table_name                  | Delete bulk that match the query                                            |
 
 ## Pagination (`?page_size= &page_id=`)
 
@@ -263,7 +264,7 @@ Result format
 }
 ```
 
-### ?metric=increment / decrement: Pprovides convenient methods for incrementing or decrementing the value of a selected columns
+### ?metric=increment / decrement: Provides convenient methods for incrementing or decrementing the value of a selected column
 
 ```
 /api/post?metric=increment&fields=view_count
