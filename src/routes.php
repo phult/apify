@@ -1,5 +1,8 @@
 <?php
 $this->app->group(['prefix' => 'api'], function ($router) {
+    $router->post('upload', [
+        'uses' => 'Megaads\Apify\Controllers\APIController@upload',
+    ]);
     $router->get('{entity}', [
         'uses' => 'Megaads\Apify\Controllers\APIController@get',
     ]);

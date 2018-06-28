@@ -133,4 +133,59 @@ class APIController extends BaseController
         $response['result'] = $model->delete();
         return $this->success($response);
     }
+    public function upload(Request $request) {
+        $hasError = false;
+        $file = $request->file('file');
+        if ($message = $this->validator($file)) {
+            $result = ["result" => $message];
+            $hasError = true;
+        } else {
+            $directoryPath = env('APIFY_UPLOAD_PATH','/home/upload');
+            try {
+                $imageName = $request->get('fileName', '');
+                if ($imageName) {
+                    $fileNameArr = explode('-', $imageName);
+                    $imageName = $fileNameArr[0];
+                }
+                $customDirectoryPath = $request->get('customDirectoryPath');
+                if ($customDirectoryPath) {
+                    $directoryPath = $directoryPath . '/' . $customDirectoryPath;
+                    if (!file_exists($directoryPath)) {
+                        mkdir($directoryPath, 0777);
+                    }
+                }
+                //$imageName = $file->getClientOriginalName();
+                $imageNewName = $imageName . '_' . microtime(true) . '.' . $file->getClientOriginalExtension();
+                $imageNewName = strtolower($imageNewName);
+                $file->move($directoryPath, strtolower($imageNewName));
+                $fullRelativePath = $imageNewName;
+                if ($customDirectoryPath) {
+                    $fullRelativePath = "/" . $customDirectoryPath . '/' . $imageNewName;
+                }
+                $result = ['result' => $fullRelativePath];
+            } catch (\Exception $ex) {
+                $result = ['result' => $ex->getMessage()];
+                $hasError = true;
+            }
+        }
+        $reponse = $this->success($result);
+        if ($hasError) {
+            $this->error($result);
+        }
+        return $reponse;
+    }
+
+    protected function validator($file) {
+        $message = '';
+        $rules = array(
+            'image' => 'mimes:jpeg,jpg,png,gif|required|max:10000' // max 10000kb
+        );
+
+        $validator = \Validator::make(['image' => $file], $rules);
+
+        if ($validator->fails()) {
+            $message = $validator->errors()->getMessages();
+        }
+        return $message;
+    }
 }
