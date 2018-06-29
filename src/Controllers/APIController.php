@@ -151,7 +151,7 @@ class APIController extends BaseController
                 if ($customDirectoryPath) {
                     $directoryPath = $directoryPath . '/' . $customDirectoryPath;
                     if (!file_exists($directoryPath)) {
-                        mkdir($directoryPath, 0777);
+                        mkdir($directoryPath, 0777,true);
                     }
                 }
                 //$imageName = $file->getClientOriginalName();
