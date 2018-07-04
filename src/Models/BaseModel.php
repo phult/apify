@@ -8,7 +8,6 @@ class BaseModel extends Model
 
     protected $guarded = ['id'];
     protected $table = null;
-
     public function bind($table)
     {
         $this->setTable($table);
@@ -24,20 +23,20 @@ class BaseModel extends Model
     {
         return with(new static )->getTable();
     }
-    
+
     protected static function boot()
     {
         parent::boot();
         static::created(function ($model) {
-            $model->publish($model->toJson(), 'megabet.services', 'topic', 'data.' . $model->getTableName() . '.created');
+            $model->publish($model->toJson(), (env('APIFY_MQ_EXCHANGE') != null ? env('APIFY_MQ_EXCHANGE') : 'apify'), 'topic', 'data.' . $model->getTableName() . '.created');
         });
         static::updated(function ($model) {
             $payload = $model->toArray();
             $payload['updated_data'] = $model->getDirty();
-            $model->publish(json_encode($payload), 'megabet.services', 'topic', 'data.' . $model->getTableName() . '.updated');
+            $model->publish(json_encode($payload), (env('APIFY_MQ_EXCHANGE') != null ? env('APIFY_MQ_EXCHANGE') : 'apify'), 'topic', 'data.' . $model->getTableName() . '.updated');
         });
         static::deleted(function ($model) {
-            $model->publish($model->toJson(), 'megabet.services', 'topic', 'data.' . $model->getTableName() . '.deleted');
+            $model->publish($model->toJson(), (env('APIFY_MQ_EXCHANGE') != null ? env('APIFY_MQ_EXCHANGE') : 'apify'), 'topic', 'data.' . $model->getTableName() . '.deleted');
         });
     }
 
