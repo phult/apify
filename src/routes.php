@@ -6,19 +6,19 @@ $this->app->group(['prefix' => 'api'], function ($router) {
     $router->get('{entity}', [
         'uses' => 'Megaads\Apify\Controllers\APIController@get',
     ]);
-    $router->get('{entity}/{id}', [
+    $router->get('{entity}/{id:[0-9]+}', [
         'uses' => 'Megaads\Apify\Controllers\APIController@show',
     ]);
     $router->post('{entity}', [
         'uses' => 'Megaads\Apify\Controllers\APIController@store',
     ]);
-    $router->put('{entity}/{id}', [
+    $router->put('{entity}/{id:[0-9]+}', [
         'uses' => 'Megaads\Apify\Controllers\APIController@update',
     ]);
-    $router->patch('{entity}/{id}', [
+    $router->patch('{entity}/{id:[0-9]+}', [
         'uses' => 'Megaads\Apify\Controllers\APIController@patch',
     ]);
-    $router->delete('{entity}/{id}', [
+    $router->delete('{entity}/{id:[0-9]+}', [
         'uses' => 'Megaads\Apify\Controllers\APIController@destroy',
     ]);
     $router->delete('{entity}', [
