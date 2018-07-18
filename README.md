@@ -1,8 +1,8 @@
 # Apify
 
-A pretty library in order to help developers to create `RESTful API services` lightly, quickly even without writing code.
+A pretty library to help developers build `RESTful API services` lightly, quickly and properly even without writing code.
 
-It's always easy to customize to suit any need such as define data relationships, modify/ create new APIs, communicate or integrate into other systems.
+It's always easy to customize to suit any need such as defining data relationships, authorization, caching, communicating or integrating into other systems.
 
 ## Features
 
@@ -48,6 +48,7 @@ Apify is packed as a composer package. So it's installed quickly in 2 steps
 | PATCH       | /api/table_name/:id              | Update row element by primary key                      |
 | DELETE      | /api/table_name/:id              | Delete a row by primary key                            |
 | DELETE      | /api/table_name                  | Delete bulk that match the query                                            |
+| POST      | /api/upload                  | Upload a file                                            |
 
 ## Pagination (`?page_size= &page_id=`)
 
@@ -136,7 +137,7 @@ Let's consider the following relationship definations:
 ```php
 namespace App\Models;
 class Nation extends \Apify\Models\BaseModel {
-    protected $table = 'nation';
+    protected $table = 'location_nation';
     public function cities() {
         return $this->hasMany('App\Models\City', 'nation_id', id);
     }
@@ -149,7 +150,7 @@ class Nation extends \Apify\Models\BaseModel {
 ```php
 namespace App\Models;
 class City extends \Apify\Models\BaseModel {
-    protected $table = 'city';
+    protected $table = 'location_city';
     public function nation() {
         return $this->belongsTo('App\Models\Nation', 'nation_id');
     }
@@ -164,7 +165,7 @@ class City extends \Apify\Models\BaseModel {
 ```php
 namespace App\Models;
 class District extends \Apify\Models\BaseModel {
-    protected $table = 'district';
+    protected $table = 'location_district';
     public function city() {
         return $this->belongsTo('App\Models\City', 'city_id');
     }
@@ -279,6 +280,22 @@ Result format
 }
 ```
 
+## Event Bus
+
+Is being updated ...
+
+## .env configurations
+
+| Key | Default value                          | Description                                            |
+|-------------|----------------------------------|--------------------------------------------------------- 
+| APIFY_PREFIX_URL         | `api`                  | API URL prefix                                 | 
+| APIFY_MODEL_NAMESPACE         | `App\Models`                  | Models namespace                                 | 
+| APIFY_UPLOAD_PATH         | `/home/upload`                  | Upload path                                 | 
+| APIFY_MQ_ENABLE         | `false`                  | Enable / Disable Message queue (Event Bus)                                | 
+| APIFY_MQ_HOST         |                  | Message queue server host                                 | 
+| APIFY_MQ_PORT         |                   | Message queue server port                                 | 
+| APIFY_MQ_USERNAME         |                   | Message queue authentication - username                                | 
+| APIFY_MQ_PASSWORD         |                   | Message queue authentication - password                                 |                                 | 
 ## License
 
 The Apify is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
@@ -286,4 +303,4 @@ The Apify is open-sourced software licensed under the [MIT license](http://opens
 
 Skype: phult.bk
 
-Email: info@megaads.vn or phult.contact@gmail.com
+Email: phult.contact@gmail.com
