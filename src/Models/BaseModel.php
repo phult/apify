@@ -28,15 +28,15 @@ class BaseModel extends Model
     {
         parent::boot();
         static::created(function ($model) {
-            $model->publish($model->toJson(), (env('APIFY_MQ_EXCHANGE') != null ? env('APIFY_MQ_EXCHANGE') : 'apify'), 'topic', 'data.' . $model->getTableName() . '.created');
+            $model->publish($model->toJson(), env('APIFY_MQ_EXCHANGE', 'apify'), 'topic', 'data.' . $model->getTableName() . '.created');
         });
         static::updated(function ($model) {
             $payload = $model->toArray();
             $payload['updated_data'] = $model->getDirty();
-            $model->publish(json_encode($payload), (env('APIFY_MQ_EXCHANGE') != null ? env('APIFY_MQ_EXCHANGE') : 'apify'), 'topic', 'data.' . $model->getTableName() . '.updated');
+            $model->publish(json_encode($payload), env('APIFY_MQ_EXCHANGE', 'apify'), 'topic', 'data.' . $model->getTableName() . '.updated');
         });
         static::deleted(function ($model) {
-            $model->publish($model->toJson(), (env('APIFY_MQ_EXCHANGE') != null ? env('APIFY_MQ_EXCHANGE') : 'apify'), 'topic', 'data.' . $model->getTableName() . '.deleted');
+            $model->publish($model->toJson(), env('APIFY_MQ_EXCHANGE', 'apify'), 'topic', 'data.' . $model->getTableName() . '.deleted');
         });
     }
 
@@ -50,12 +50,12 @@ class BaseModel extends Model
 
     public function publish($data, $exchange, $exchange_type = 'fanout', $routing_key = '')
     {
-        $enable = env('APIFY_MQ_ENABLE');
-        if ($enable != null && $enable == true) {
+        $enable = env('APIFY_MQ_ENABLE', false);
+        if ($enable) {
             $host = env('APIFY_MQ_HOST');
+            $port = env('APIFY_MQ_PORT');
             $username = env('APIFY_MQ_USERNAME');
             $password = env('APIFY_MQ_PASSWORD');
-            $port = env('APIFY_MQ_PORT');
             $connection = new AMQPStreamConnection($host, $port, $username, $password);
             $queueChannel = $connection->channel();
             $queueChannel->exchange_declare($exchange, $exchange_type, false, false, false);

@@ -10,8 +10,8 @@ class BaseController extends Controller
 
     protected function getModel($entity)
     {
-        $modelNameSpace = getenv('APP_MODEL_NAMESPACE');
-        $entityClass = ($modelNameSpace != null ? $modelNameSpace : 'App\Models') . '\\' . str_replace('_', '', ucwords($entity, '_'));
+        $modelNameSpace = env('APIFY_MODEL_NAMESPACE', 'App\Models');
+        $entityClass = $modelNameSpace . '\\' . str_replace('_', '', ucwords($entity, '_'));
         if (class_exists($entityClass)) {
             $retval = new $entityClass;
         } else {
@@ -158,7 +158,7 @@ class BaseController extends Controller
     }
 
     protected function buildSelectionQuery($query, $selections, $tableAlias = null)
-    {
+    {                        
         if ($selections != null && count($selections) > 0) {
             foreach ($selections as $selection) {
                 if (preg_match("/^count/", $selection)

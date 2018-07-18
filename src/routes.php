@@ -1,5 +1,6 @@
 <?php
-$this->app->group(['prefix' => 'api'], function ($router) {
+$prefix = env('APIFY_PREFIX_URL', 'api');
+$this->app->group(['prefix' => $prefix], function ($router) {
     $router->post('upload', [
         'uses' => 'Megaads\Apify\Controllers\APIController@upload',
     ]);

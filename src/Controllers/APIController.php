@@ -133,14 +133,15 @@ class APIController extends BaseController
         $response['result'] = $model->delete();
         return $this->success($response);
     }
-    public function upload(Request $request) {
+    public function upload(Request $request)
+    {
         $hasError = false;
         $file = $request->file('file');
         if ($message = $this->validator($file)) {
             $result = ["result" => $message];
             $hasError = true;
         } else {
-            $directoryPath = env('APIFY_UPLOAD_PATH','/home/upload');
+            $directoryPath = env('APIFY_UPLOAD_PATH', '/home/upload');
             try {
                 $imageName = $request->get('fileName', '');
                 if ($imageName) {
@@ -151,7 +152,7 @@ class APIController extends BaseController
                 if ($customDirectoryPath) {
                     $directoryPath = $directoryPath . '/' . $customDirectoryPath;
                     if (!file_exists($directoryPath)) {
-                        mkdir($directoryPath, 0777,true);
+                        mkdir($directoryPath, 0777, true);
                     }
                 }
                 //$imageName = $file->getClientOriginalName();
@@ -175,10 +176,11 @@ class APIController extends BaseController
         return $reponse;
     }
 
-    protected function validator($file) {
+    protected function validator($file)
+    {
         $message = '';
         $rules = array(
-            'image' => 'mimes:jpeg,jpg,png,gif|required|max:10000' // max 10000kb
+            'image' => 'mimes:jpeg,jpg,png,gif|required|max:10000', // max 10000kb
         );
 
         $validator = \Validator::make(['image' => $file], $rules);
