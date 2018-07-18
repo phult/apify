@@ -53,7 +53,7 @@ class FilterBuilderManagement
         return $retval;
     }
 
-    public function buildQueryParams($request, $entity)
+    public function buildQueryParams($request)
     {
         $retval = [];
         if ($request->has('filters')) {
@@ -73,8 +73,9 @@ class FilterBuilderManagement
         return $retval;
     }
 
-    public function buildQuery($query, $filters, $entity)
+    public function buildQuery($query, $filters)
     {
+        $entity = $query->getModel()->getTable();
         foreach ($filters as $filter) {
             $field = $filter['field'];
             $operator = $filter['operator'];
@@ -89,7 +90,7 @@ class FilterBuilderManagement
             }
             $builder = $this->getBuilder($operator);
             if ($builder != null) {
-                if ($tableAlias != $entity) {
+                if ($tableAlias != $query->getModel()->getTable()) {
                     $filter['field'] = $field;
                     $query = $query->whereHas($tableAlias, function ($query) use ($filter, $builder) {
                         $query = $builder->buildQuery($query, $filter);

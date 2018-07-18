@@ -9,13 +9,13 @@ class APIController extends BaseController
     public function get($entity, Request $request)
     {
         $response = [];
-        $queryParams = $this->buildQueryParams($request, $entity);
         $model = $this->getModel($entity);
-        $model = $this->buildSelectionQuery($model, $queryParams['fields'], $entity);
-        $model = $this->buildEmbedQuery($model, $queryParams['embeds'], $entity);
-        $model = $this->buildSortQuery($model, $queryParams['sorts'], $entity);
-        $model = $this->buildFilterQuery($model, $queryParams['filters'], $entity);
-        $model = $this->buildGroupQuery($model, $queryParams['groups'], $entity);
+        $queryParams = $this->buildQueryParams($request);
+        $model = $this->buildSelectionQuery($model, $queryParams['fields']);
+        $model = $this->buildEmbedQuery($model, $queryParams['embeds']);
+        $model = $this->buildSortQuery($model, $queryParams['sorts']);
+        $model = $this->buildFilterQuery($model, $queryParams['filters']);
+        $model = $this->buildGroupQuery($model, $queryParams['groups']);
         if ($queryParams['metric'] == 'count'
             || $queryParams['metric'] == 'first'
             || $queryParams['metric'] == 'increment'
