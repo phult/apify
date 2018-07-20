@@ -41,16 +41,16 @@ Apify is packed as a composer package. So it's installed quickly in 2 steps
 
 | HTTP Method | API URL                          | Description                                            |
 |-------------|----------------------------------|--------------------------------------------------------- 
-| GET         | /api/table_name                  | List all rows of table that match the query                                 | 
-| GET         | /api/table_name/:id              | Retrieve a row by primary key :id                      |
-| POST        | /api/table_name                  | Insert a new row, bulk insertion is also avaiable                                       |
-| PUT         | /api/table_name/:id              | Replaces existed row with new one                      |
-| PATCH       | /api/table_name/:id              | Update row element by primary key                      |
-| DELETE      | /api/table_name/:id              | Delete a row by primary key                            |
-| DELETE      | /api/table_name                  | Delete bulk that match the query                                            |
+| GET         | /api/entity                  | List all records of table that match the query                                 | 
+| GET         | /api/entity/:id              | Retrieve a record by primary key :id                      |
+| POST        | /api/entity                  | Insert a new record, bulk inserting is also avaiable                                       |
+| PUT         | /api/entity/:id              | Replaces existed record with new one                      |
+| PATCH       | /api/entity/:id              | Update record element by primary key                      |
+| DELETE      | /api/entity/:id              | Delete a record by primary key                            |
+| DELETE      | /api/entity                  | Delete bulk records that match the query                                            |
 | POST      | /api/upload                  | Upload a file                                            |
 
-## Pagination (`?page_size= &page_id=`)
+## Pagination
 
 | Parameter   | Required    | Default    | Description                                                      |
 |-------------|-------------|------------|------------------------------------------------------------------|
@@ -61,7 +61,7 @@ Apify is packed as a composer package. So it's installed quickly in 2 steps
 /api/post?page_id=2&page_size=20
 ```
 
-## Sorting (`?sorts=`)
+## Sorting
 
 Order by multiple columns using **`sorts`** parameter
 
@@ -83,15 +83,15 @@ Order by multiple columns using **`sorts`** parameter
 /api/post?sorts=user_id,-created_at
 ```
 
-## Selection (`?fields=`)
+## Selection
 
-Select columns from the results using **`fields`** parameter. SQL aggregate functions such as `COUNT`, `MAX`, `MIN`, `SUM`, `AVG`, SQL aliases are also available
+Select columns from the records using **`fields`** parameter. SQL aggregate functions such as `COUNT`, `MAX`, `MIN`, `SUM`, `AVG`, SQL aliases are also available
 
 ```
 /api/post?fields=id,content,user_id,sum(view_count) as view_sum
 ```
 
-## Group By (`?groups=`)
+## Group By
 
 Group the result-set by one or more columns using **`groups`** parameter and combine with aggregate functions using `Selection`
 
@@ -99,7 +99,7 @@ Group the result-set by one or more columns using **`groups`** parameter and com
 /api/post?fields=user_id,sum(view_count)&groups=user_id
 ```
 
-## Filtering (`?filters=`)
+## Filtering
 
 | Operator   | Condition          |  For example                                         
 |--------------|--------------------|----------------------------------
@@ -205,9 +205,9 @@ Even nested relationships
 /api/city?filters=nation.location_code=EU,districts.name~land
 ```
 
-## Metric (`?metric=`)
+## Metric
 
-### ?metric=get (default): Retrieve all results that match the query
+### metric=get (by default): Retrieve all records that match the query
 
 ```
 /api/post
@@ -218,7 +218,7 @@ or
 /api/post?metric=get
 ```
 
-Result format
+Response format
 
 ```json
 {
@@ -229,56 +229,63 @@ Result format
         "page_size": 50,
         "page_id": 0
     },
-    "results": [],
+    "result": [],
     "status": "successful"
 }
 ```
 
-### ?metric=first: Retrieve the first result that matchs the query
+### metric=first: Retrieve the first record that matchs the query
 
 
 ```
 /api/post?metric=first
 ```
 
-Result format
+Response format
 
 ```json
 {    
-    "results": {},
+    "result": {},
     "status": "successful"
 }
 ```
 
-### ?metric=count: Retrieve the number of results that match the query
+### metric=count: Retrieve the number of records that match the query
 
 ```
 /api/post?metric=count
 ```
 
-Result format
+Response format
 
 ```json
 {    
-    "results": 50,
+    "result": 50,
     "status": "successful"
 }
 ```
 
-### ?metric=increment / decrement: Provides convenient methods for incrementing or decrementing the value of a selected column
+### metric=increment/ decrement: Provides convenient methods for incrementing or decrementing the value of a selected column
 
 ```
 /api/post?metric=increment&fields=view_count
 ```
 
-Result format
+Response format
 
 ```json
 {    
-    "results": 1,
+    "result": 1,
     "status": "successful"
 }
 ```
+## Entity conventions
+
+* The API entity name is the same as a model class name
+
+* Or the API entity name in `snake_case` that correspond to a model class with the name in `CamelCase`
+
+* Or the API entity name is the same as a DB table name
 
 ## Event Bus
 
@@ -301,6 +308,6 @@ Is being updated ...
 The Apify is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
 ## Contact us/ Instant feedback
 
-Skype: phult.bk
+Email: phult.contact@gmail.com, xuanlap93@gmail.com
 
-Email: phult.contact@gmail.com
+Skype: [phult.bk](skype:phult.bk?chat)

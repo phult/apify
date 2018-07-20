@@ -1,6 +1,6 @@
 {
     "name": "megaads/apify",
-    "description": "Dynamic generator for RESTful API",
+    "description": "A pretty library to help developers build `RESTful API services` lightly, quickly and properly even without writing code",
     "keywords": [
         "api",
         "rest",
@@ -21,6 +21,10 @@
         {
             "name": "phuluong",
             "email": "phult.contact@gmail.com"
+        },
+        {
+            "name": "lapdam",
+            "email": "xuanlap93@gmail.com"
         }
     ],
     "require": {
