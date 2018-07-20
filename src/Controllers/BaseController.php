@@ -11,12 +11,17 @@ class BaseController extends Controller
     protected function getModel($entity)
     {
         $modelNameSpace = env('APIFY_MODEL_NAMESPACE', 'App\Models');
-        $entityClass = $modelNameSpace . '\\' . str_replace('_', '', ucwords($entity, '_'));
+        $entityClass = $modelNameSpace . '\\' . $entity;
         if (class_exists($entityClass)) {
             $retval = new $entityClass;
         } else {
-            $retval = new BaseModel();
-            $retval->bind($entity);
+            $entityClass = $modelNameSpace . '\\' . str_replace('_', '', ucwords($entity, '_'));
+            if (class_exists($entityClass)) {
+                $retval = new $entityClass;
+            } else {
+                $retval = new BaseModel();
+                $retval->bind($entity);
+            }
         }
         $retval->entity = $entity;
         return $retval;
