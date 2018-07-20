@@ -1,6 +1,6 @@
 {
     "name": "megaads/apify",
-    "description": "A pretty library to help developers build `RESTful API services` lightly, quickly and properly even without writing code",
+    "description": "A pretty library to help developers build RESTful APIs lightly, quickly and properly even without writing code",
     "keywords": [
         "api",
         "rest",
