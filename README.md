@@ -1,6 +1,6 @@
 # Apify
 
-A pretty library to help developers build `RESTful API services` lightly, quickly and properly even without writing code.
+A pretty library to help developers build `RESTful APIs` lightly, quickly and properly even without writing code.
 
 It's always easy to customize to suit any need such as defining data relationships, authorization, caching, communicating or integrating into other systems.
 
@@ -39,16 +39,16 @@ Apify is packed as a composer package. So it's installed quickly in 2 steps
 
 ## API Overview
 
-| HTTP Method | API URL                          | Description                                            |
-|-------------|----------------------------------|--------------------------------------------------------- 
-| GET         | /api/entity                  | List all records of table that match the query                                 | 
-| GET         | /api/entity/:id              | Retrieve a record by primary key :id                      |
-| POST        | /api/entity                  | Insert a new record, bulk inserting is also avaiable                                       |
-| PUT         | /api/entity/:id              | Replaces existed record with new one                      |
-| PATCH       | /api/entity/:id              | Update record element by primary key                      |
-| DELETE      | /api/entity/:id              | Delete a record by primary key                            |
-| DELETE      | /api/entity                  | Delete bulk records that match the query                                            |
-| POST      | /api/upload                  | Upload a file                                            |
+| HTTP Method | API URL                          | Description           |   For example
+|-------------|----------------------------------|-----------------------|--------------------------------- 
+| GET         | `/api/entity`                      | List all records of table that match the query                 |   `curl http://my-api.com/api/user?filters=age>20` |
+| GET         | `/api/entity/:id`                  | Retrieve a record by primary key :id                      |   `curl http://my-api.com/api/user/123` |
+| POST        | `/api/entity`                      | Insert a new record, bulk inserting is also avaiable      |    `curl -X POST http://my-api.com/api/user -d '[{"username":"user1", "age":"20"},{"username":"user2", "age":"25"}]' -H "Content-Type: application/json"` |
+| PUT         | `/api/entity/:id`                  | Replaces existed record with new one                      | `curl -X PUT http://my-api.com/api/user/123 -d '{"id":"123", "username":"user1", "age":"20"}' -H "Content-Type: application/json"` |
+| PATCH       | `/api/entity/:id`                  | Update record element by primary key                      |  `curl -X PATCH http://my-api.com/api/user/123 -d '{"age":"21"}' -H "Content-Type: application/json"` |
+| DELETE      | `/api/entity/:id`                  | Delete a record by primary key                            |  `curl -X DELETE http://my-api.com/api/user/123` |
+| DELETE      | `/api/entity`                      | Delete bulk records that match the query                   |  `curl -X DELETE http://my-api.com/api/user?filters=age>100` |
+| POST      | `/api/upload`                        | Upload a file                                            |  `curl -X POST http://my-api.com/api/upload -H "Content-Type: multipart/form-data" -F "data=@song.mp3"`
 
 ## Pagination
 
@@ -116,13 +116,25 @@ Group the result-set by one or more columns using **`groups`** parameter and com
 | ~            |  Like              | /api/post?filters=title~hello
 | !~           |  Not like          | /api/post?filters=title!~hello
 
-Apify supports filtering records based on more than one `AND` condition by using comma. For example: 
+Apify supports filtering records based on more than one `AND`, `NOT` condition by using comma. For example: 
 
 ```
 /api/post?filters=user_id=1,status={enabled;pending},tile~hello,view_count!=null
 ```
 
 Complex conditions that combine `AND`, `OR` and `NOT` will be available soon.
+
+## Entity conventions
+
+Apify works by a simple mechanism, looking for a model class that correspond to the API entity, otherwise the API entity will be matched to a suitable DB table. That means no model class is required to create, do it only in the case of defining relationships, customizing.
+
+So API entity name should follow one of the conventions:
+
+* The API entity name is the same as a model class name
+
+* Or the API entity name in `snake_case` that correspond to a model class with the name in `CamelCase`
+
+* Or the API entity name is the same as a DB table name
 
 ## Relationships
 
@@ -279,13 +291,6 @@ Response format
     "status": "successful"
 }
 ```
-## Entity conventions
-
-* The API entity name is the same as a model class name
-
-* Or the API entity name in `snake_case` that correspond to a model class with the name in `CamelCase`
-
-* Or the API entity name is the same as a DB table name
 
 ## Event Bus
 
@@ -308,6 +313,6 @@ Is being updated ...
 The Apify is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
 ## Contact us/ Instant feedback
 
-Email: phult.contact@gmail.com, xuanlap93@gmail.com
+Email: phult.contact@gmail.com
 
 Skype: [phult.bk](skype:phult.bk?chat)
