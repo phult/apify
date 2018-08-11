@@ -16,6 +16,7 @@ class ApifyServiceProvider extends ServiceProvider
         include __DIR__ . '/routes.php';
         $this->app->middleware([
             Middlewares\CorsMiddleware::class,
+            Middlewares\ValidationMiddleware::class,
         ]);
     }
 
