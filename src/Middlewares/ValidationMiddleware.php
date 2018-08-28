@@ -11,7 +11,7 @@ class ValidationMiddleware extends BaseController {
         $prefix = env('APIFY_PREFIX_URL', 'api');
         if ($request->isMethod('POST')||$request->isMethod('PUT')||$request->isMethod('PATCH')) {
             if (!empty($prefix)) {
-                $entity = explode("/", explode($prefix, $request->url())[1])[0];
+                $entity = explode("/", explode('/'.$prefix.'/', $request->url())[1])[0];
             }else{
                 $entity = $request->segment(2);
             }
