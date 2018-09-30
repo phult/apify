@@ -24,7 +24,11 @@ class EqBuilder extends FilterBuilder
         if (strtolower($filter['value']) == 'null') {
             $query = $query->whereNull($filter['field']);
         } else {
-            $query = $query->where($filter['field'], '=', $filter['value']);
+            if (strrpos(strtolower($filter['field']), '.raw') >= 0) {
+                $query = $query->whereRaw($filter['value']);
+            } else {
+                $query = $query->where($filter['field'], '=', $filter['value']);
+            }
         }
         return $query;
     }
