@@ -57,7 +57,32 @@ class FilterBuilderManagement
     {
         $retval = [];
         if ($request->has('filters')) {
-            $params = explode(',', $request->input('filters'));
+            $params = [];
+            $filterString = $request->input('filters');
+            $filterStringLength = strlen($filterString);
+            $paramBuffer = "";
+            $brackets = 0;
+            for ($i = 0; $i < $filterStringLength; $i++) {
+                $char = substr($filterString, $i, 1);
+                if ($char != ',') {
+                    $paramBuffer .= $char;
+                    if ($char == '(') {
+                        $brackets++;
+                    }
+                    if ($char == ')') {
+                        $brackets--;
+                    }
+                } else {
+                    if ($brackets == 0) {
+                        $params[] = $paramBuffer;
+                        $paramBuffer = "";
+                        $brackets = 0;
+                    } else {
+                        $paramBuffer .= $char;
+                    }
+                }
+            }
+            $params[] = $paramBuffer;
             foreach ($params as $param) {
                 foreach ($this->builders as $filterBuilder) {
                     $filter = $filterBuilder->buildQueryParam($param);
