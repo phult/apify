@@ -127,7 +127,7 @@ class BaseController extends Controller
         $pageSize = -1;
         $pageId = -1;
         $pageCount = 1;
-        $hasNext = true;
+        $hasNext = false;
         $offSet = 0;
         if ($params['pagination']['page_size'] >= 0
             && $params['pagination']['page_id'] >= 0) {
