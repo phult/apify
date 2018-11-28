@@ -14,10 +14,8 @@ class ApifyServiceProvider extends ServiceProvider
     public function boot()
     {
         include __DIR__ . '/routes.php';
-        $this->app->middleware([
-            Middlewares\CorsMiddleware::class,
-            Middlewares\ValidationMiddleware::class,
-        ]);
+        $this->app['router']->middleware('CorsMiddleware', 'Middlewares\CorsMiddleware');
+        $this->app['router']->middleware('ValidationMiddleware', 'Middlewares\ValidationMiddleware');
     }
 
     /**
