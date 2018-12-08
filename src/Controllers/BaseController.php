@@ -1,11 +1,15 @@
 <?php
 namespace Megaads\Apify\Controllers;
 
-use Laravel\Lumen\Routing\Controller;
 use Megaads\Apify\FilterBuilders\FilterBuilderManagement;
 use Megaads\Apify\Models\BaseModel;
+if (class_exists('Illuminate\Routing\Controller')) {
+    class DynamicController extends \Illuminate\Routing\Controller {}
+} else if (class_exists('Laravel\Lumen\Routing\Controller')) {
+    class DynamicController extends \Laravel\Lumen\Routing\Controller {}
+}
 
-class BaseController extends Controller
+class BaseController extends DynamicController
 {
 
     protected function getModel($entity)
