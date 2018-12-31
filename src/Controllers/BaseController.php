@@ -12,6 +12,8 @@ if (class_exists('Illuminate\Routing\Controller')) {
 class BaseController extends DynamicController
 {
 
+    protected $simplePaginate = false;
+
     protected function getModel($entity)
     {
         $modelNameSpace = env('APIFY_MODEL_NAMESPACE', 'App\Models');
@@ -33,6 +35,9 @@ class BaseController extends DynamicController
 
     protected function buildQueryParams($request)
     {
+        if ($request->has('simple_paginate') && $request->input('simple_paginate') == 1) {
+            $this->simplePaginate = true;
+        }
         $retval = [
             'metric' => 'get',
             'pagination' => [
@@ -126,22 +131,31 @@ class BaseController extends DynamicController
 
     public function fetchMetaData($query, $params = [])
     {
-        $params['metric'] = 'count';
-        $count = $this->fetchData($query, $params);
-        $pageSize = -1;
-        $pageId = -1;
-        $pageCount = 1;
-        $hasNext = false;
-        $offSet = 0;
-        if ($params['pagination']['page_size'] >= 0
-            && $params['pagination']['page_id'] >= 0) {
+        if (!$this->simplePaginate) {
+            $params['metric'] = 'count';
+            $count = $this->fetchData($query, $params);
+            $pageSize = -1;
+            $pageId = -1;
+            $pageCount = 1;
+            $hasNext = false;
+            $offSet = 0;
+            if ($params['pagination']['page_size'] >= 0
+                && $params['pagination']['page_id'] >= 0) {
+                $pageSize = $params['pagination']['page_size'];
+                $pageId = $params['pagination']['page_id'];
+                $pageCount = ceil($count / $pageSize);
+                $hasNext = true;
+                if ($pageId + 1 >= $pageCount) {
+                    $hasNext = false;
+                }
+                $offSet = ($pageId) * $pageSize;
+            }
+        } else {
             $pageSize = $params['pagination']['page_size'];
             $pageId = $params['pagination']['page_id'];
-            $pageCount = ceil($count / $pageSize);
             $hasNext = true;
-            if ($pageId + 1 >= $pageCount) {
-                $hasNext = false;
-            }
+            $count = 0;
+            $pageCount = 0;
             $offSet = ($pageId) * $pageSize;
         }
         return [
