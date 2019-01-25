@@ -18,10 +18,12 @@ class ApifyServiceProvider extends ServiceProvider
             $this->app->middleware([
                 Middlewares\CorsMiddleware::class,
                 Middlewares\ValidationMiddleware::class,
+                Middlewares\AuthMiddleware::class,
             ]);
         } else {
             $this->app['router']->middleware('CorsMiddleware', 'Middlewares\CorsMiddleware');
             $this->app['router']->middleware('ValidationMiddleware', 'Middlewares\ValidationMiddleware');
+            $this->app['router']->middleware('AuthMiddleware', 'Middlewares\AuthMiddleware');
         }
 
     }

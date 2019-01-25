@@ -8,6 +8,7 @@ class APIController extends BaseController
 {
     public function get($entity, Request $request)
     {
+        \Megaads\Apify\Middlewares\AuthMiddleware::checkPermission($entity, "read");
         $response = [];
         $model = $this->getModel($entity);
         $queryParams = $this->buildQueryParams($request);
@@ -30,6 +31,7 @@ class APIController extends BaseController
 
     public function show($entity, $id, Request $request)
     {
+        \Megaads\Apify\Middlewares\AuthMiddleware::checkPermission($entity, "read");
         $queryParams = $this->buildQueryParams($request, $entity);
         $model = $this->getModel($entity);
         $model = $this->buildSelectionQuery($model, $queryParams['fields'], $entity);
@@ -42,10 +44,12 @@ class APIController extends BaseController
 
     public function store($entity, Request $request)
     {
+        \Megaads\Apify\Middlewares\AuthMiddleware::checkPermission($entity, "create");
         $result = [];
         $status = "successful";
         $model = $this->getModel($entity);
-        $inputs = $request->all();
+        $inputs = $request->except(\Megaads\Apify\Middlewares\AuthMiddleware::$apiTokenField);
+
         try {
             if (isset($inputs[0]) && is_array($inputs[0])) {
                 \DB::beginTransaction();
@@ -79,8 +83,9 @@ class APIController extends BaseController
 
     public function update($entity, $id, Request $request)
     {
+        \Megaads\Apify\Middlewares\AuthMiddleware::checkPermission($entity, "update");
         $model = $this->getModel($entity);
-        $attributes = $request->all();
+        $attributes = $request->except(\Megaads\Apify\Middlewares\AuthMiddleware::$apiTokenField);
         $obj = $model->find($id);
         if ($obj == null) {
             return $this->error([
@@ -95,8 +100,9 @@ class APIController extends BaseController
 
     public function patch($entity, $id, Request $request)
     {
+        \Megaads\Apify\Middlewares\AuthMiddleware::checkPermission($entity, "update");
         $model = $this->getModel($entity);
-        $attributes = $request->all();
+        $attributes = $request->except(\Megaads\Apify\Middlewares\AuthMiddleware::$apiTokenField);
         $obj = $model->find($id);
         if ($obj == null) {
             return $this->error([
@@ -111,6 +117,7 @@ class APIController extends BaseController
 
     public function destroy($entity, $id, Request $request)
     {
+        \Megaads\Apify\Middlewares\AuthMiddleware::checkPermission($entity, "delete");
         $model = $this->getModel($entity);
         $obj = $model->find($id);
         if ($obj == null) {
@@ -125,6 +132,7 @@ class APIController extends BaseController
     }
     public function destroyBulk($entity, Request $request)
     {
+        \Megaads\Apify\Middlewares\AuthMiddleware::checkPermission($entity, "delete");
         $response = [];
         $queryParams = $this->buildQueryParams($request, $entity);
         $model = $this->getModel($entity);
