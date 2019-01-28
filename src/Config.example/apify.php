@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'enable' => false,
+    'enable' => true,
     'api_token_field' => 'api_token',
     'users' => [
         [

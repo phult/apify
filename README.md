@@ -7,7 +7,7 @@ It's always easy to customize to suit any need such as defining data relationshi
 ## Features
 
 * Serves RESTful APIs for any MySql database
-  * Pagination 
+  * Pagination
   * Sorting
   * Selection
   * Grouping, Having
@@ -27,7 +27,7 @@ Apify is packed as a composer package. So it's installed quickly in 2 steps
 
     `composer require megaads/apify`
 
-2. Register the provider: 
+2. Register the provider:
 
     `Megaads\Apify\ApifyServiceProvider`
 
@@ -40,7 +40,7 @@ Apify is packed as a composer package. So it's installed quickly in 2 steps
 ## API Overview
 
 | HTTP Method | API URL                          | Description           |   For example
-|-------------|----------------------------------|-----------------------|--------------------------------- 
+|-------------|----------------------------------|-----------------------|---------------------------------
 | GET         | `/api/entity`                      | List all records of table that match the query                 |   `curl http://my-api.com/api/user?filters=age>20` |
 | GET         | `/api/entity/:id`                  | Retrieve a record by primary key :id                      |   `curl http://my-api.com/api/user/123` |
 | POST        | `/api/entity`                      | Insert a new record, bulk inserting is also avaiable      |    `curl -X POST http://my-api.com/api/user -d '[{"username":"user1", "age":"20"},{"username":"user2", "age":"25"}]' -H "Content-Type: application/json"` |
@@ -116,7 +116,7 @@ Group the result-set by one or more columns using **`groups`** parameter and com
 | ~            |  Like              | /api/post?filters=title~hello
 | !~           |  Not like          | /api/post?filters=title!~hello
 
-Apify supports filtering records based on more than one `AND`, `NOT` condition by using comma. For example: 
+Apify supports filtering records based on more than one `AND`, `NOT` condition by using comma. For example:
 
 ```
 /api/post?filters=user_id=1,status={enabled;pending},tile~hello,view_count!=null
@@ -299,15 +299,20 @@ Is being updated ...
 ## .env configurations
 
 | Key | Default value                          | Description                                            |
-|-------------|----------------------------------|--------------------------------------------------------- 
-| APIFY_PREFIX_URL         | `api`                  | API URL prefix                                 | 
-| APIFY_MODEL_NAMESPACE         | `App\Models`                  | Models namespace                                 | 
-| APIFY_UPLOAD_PATH         | `/home/upload`                  | Upload path                                 | 
-| APIFY_MQ_ENABLE         | `false`                  | Enable / Disable Message queue (Event Bus)                                | 
-| APIFY_MQ_HOST         |                  | Message queue server host                                 | 
-| APIFY_MQ_PORT         |                   | Message queue server port                                 | 
-| APIFY_MQ_USERNAME         |                   | Message queue authentication - username                                | 
-| APIFY_MQ_PASSWORD         |                   | Message queue authentication - password                                 |                                 | 
+|-------------|----------------------------------|---------------------------------------------------------
+| APIFY_PREFIX_URL         | `api`                  | API URL prefix                                 |
+| APIFY_MODEL_NAMESPACE         | `App\Models`                  | Models namespace                                 |
+| APIFY_UPLOAD_PATH         | `/home/upload`                  | Upload path                                 |
+| APIFY_MQ_ENABLE         | `false`                  | Enable / Disable Message queue (Event Bus)                                |
+| APIFY_MQ_HOST         |                  | Message queue server host                                 |
+| APIFY_MQ_PORT         |                   | Message queue server port                                 |
+| APIFY_MQ_USERNAME         |                   | Message queue authentication - username                                |
+| APIFY_MQ_PASSWORD         |                   | Message queue authentication - password                                 |                                 |
+
+## Authenticate Apify & authorize Apify?
+
+Read docs here : https://github.com/megaads-vn/apify/blob/master/README-AUTH.md
+
 ## License
 
 The Apify is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)

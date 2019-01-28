@@ -56,7 +56,7 @@ class AuthMiddleware extends BaseController
     }
 
     public function loadConfig() {
-        return require_once(realpath(dirname(__FILE__) . '/../Config/auth.php'));
+        return config('apify');
     }
 
     public function getPermissions ($apiToken, $configs) {
