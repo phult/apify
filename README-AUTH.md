@@ -38,7 +38,7 @@ Now every with api_token like this `/product?api_token=read` can read product, a
 
 ### Disable apify auth plugins?
 
-Change `'enable' => true`, to `'enable'` => false.
+Change `'enable' => true`, to `'enable' => false`.
 
 ### Add, edit, remove user?
 
@@ -60,8 +60,9 @@ Just edit user with `'token' = ''`
 
 Edit permissions inside `permissions`. To grant an access to user, just add that permission to permissions array.
 
+
 | Endpoint | Method | Permission | Description |
-| :------------- | :------------- |
+| :------------- | :------------- | :------------- |:------------- |
 | /api/entity | get | read | List all records of table that match the query |
 | /api/entity/:id | get | read | Retrieve a record by primary key :id |
 | /api/entity | post | create | Insert a new record, bulk inserting is also avaiable |
