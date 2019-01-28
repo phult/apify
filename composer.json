@@ -25,7 +25,11 @@
         {
             "name": "lapdam",
             "email": "xuanlap93@gmail.com"
-        }
+        },
+        {
+            "name": "quanbka",
+            "email": "quanbka.cntt@gmail.com"
+        },
     ],
     "require": {
         "php": ">=5.6.4"
