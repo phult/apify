@@ -141,61 +141,50 @@ class APIController extends BaseController
         $response['result'] = $model->delete();
         return $this->success($response);
     }
-    public function upload(Request $request)
-    {
-        $hasError = false;
-        $file = $request->file('file');
-        if ($message = $this->validator($file)) {
-            $result = ["result" => $message];
-            $hasError = true;
-        } else {
-            $directoryPath = env('APIFY_UPLOAD_PATH', '/home/upload');
-            try {
-                $imageName = $request->get('fileName', '');
-                if ($imageName) {
-                    $fileNameArr = explode('-', $imageName);
-                    $imageName = $fileNameArr[0];
-                }
-                $customDirectoryPath = $request->get('customDirectoryPath');
-                if ($customDirectoryPath) {
-                    $directoryPath = $directoryPath . '/' . $customDirectoryPath;
-                    if (!file_exists($directoryPath)) {
-                        mkdir($directoryPath, 0777, true);
-                    }
-                }
-                //$imageName = $file->getClientOriginalName();
-                $imageNewName = $imageName . '_' . microtime(true) . '.' . $file->getClientOriginalExtension();
-                $imageNewName = strtolower($imageNewName);
-                $file->move($directoryPath, strtolower($imageNewName));
-                $fullRelativePath = $imageNewName;
-                if ($customDirectoryPath) {
-                    $fullRelativePath = "/" . $customDirectoryPath . '/' . $imageNewName;
-                }
-                $result = ['result' => $fullRelativePath];
-            } catch (\Exception $ex) {
-                $result = ['result' => $ex->getMessage()];
-                $hasError = true;
+
+    public function upload(Request $request) {
+        $files = $request->file('file');
+        $directoryPath = env('APIFY_UPLOAD_PATH', '/home/upload');
+        $customDirectoryPath = $request->get('customDirectoryPath');
+        if (empty($files)) {
+            $result = ["result" => "File required!"];
+            return $this->error($result);
+        }
+
+        if (!empty($customDirectoryPath)) {
+            $directoryPath = $directoryPath . '/' . $customDirectoryPath;
+            if (!file_exists($directoryPath)) {
+                mkdir($directoryPath, 0777, true);
             }
         }
-        $reponse = $this->success($result);
-        if ($hasError) {
-            $this->error($result);
+
+        if (is_array($files)) {
+            $output = [];
+            foreach($files as $file) {
+                $newFileName = time()."-".$file->getClientOriginalName();
+                $newFileName = strtolower($newFileName);
+                $file->move($directoryPath, $newFileName);
+                $fullRelativePath = $newFileName;
+                if ($customDirectoryPath) {
+                    $fullRelativePath = "/" . $customDirectoryPath . '/' . $newFileName;
+                }
+                array_push($output, $fullRelativePath);
+            }
+            $result = ['result' => $output];
+
+        } else {
+
+            $newFileName = time()."-".$files->getClientOriginalName();
+            $newFileName = strtolower($newFileName);
+            $files->move($directoryPath, $newFileName);
+            $fullRelativePath = $newFileName;
+            if ($customDirectoryPath) {
+                $fullRelativePath = "/" . $customDirectoryPath . '/' . $newFileName;
+            }
+            $result = ['result' => $fullRelativePath];
+
         }
-        return $reponse;
-    }
 
-    protected function validator($file)
-    {
-        $message = '';
-        $rules = array(
-            'image' => 'mimes:jpeg,jpg,png,gif|required|max:10000', // max 10000kb
-        );
-
-        $validator = \Validator::make(['image' => $file], $rules);
-
-        if ($validator->fails()) {
-            $message = $validator->errors()->getMessages();
-        }
-        return $message;
+        return $this->success($result);
     }
 }
