@@ -25,8 +25,7 @@ class ApifyServiceProvider extends ServiceProvider
             $this->app['router']->middleware('ValidationMiddleware', 'Middlewares\ValidationMiddleware');
             $this->app['router']->middleware('AuthMiddleware', 'Middlewares\AuthMiddleware');
         }
-        app()->configure('apify');
-
+        config('apify');
     }
 
     /**
