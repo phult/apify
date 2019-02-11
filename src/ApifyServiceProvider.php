@@ -21,9 +21,10 @@ class ApifyServiceProvider extends ServiceProvider
                 Middlewares\AuthMiddleware::class,
             ]);
         } else {
-            $this->app['router']->middleware('CorsMiddleware', 'Middlewares\CorsMiddleware');
-            $this->app['router']->middleware('ValidationMiddleware', 'Middlewares\ValidationMiddleware');
-            $this->app['router']->middleware('AuthMiddleware', 'Middlewares\AuthMiddleware');
+            $kernel = $this->app->make('Illuminate\Contracts\Http\Kernel');
+            $kernel->pushMiddleware('\Megaads\Apify\Middlewares\CorsMiddleware');
+            $kernel->pushMiddleware('\Megaads\Apify\Middlewares\ValidationMiddleware');
+            $kernel->pushMiddleware('\Megaads\Apify\Middlewares\AuthMiddleware');
         }
         if (method_exists($this->app, 'configure')) {
             $this->app->configure('apify');
