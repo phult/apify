@@ -94,6 +94,8 @@ User with api_token can create, read, update, delete user eloquent / table; but 
 
 Change ```'api_token_field' => 'api_token'``` to ```'api_token_field' => 'your_api_token_field'```
 
+## Logging
+Need to know what blocked request's ip & uri? Just change config logging => true in apify.php 
 
 ## Contact us/ Instant feedback
 

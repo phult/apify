@@ -2,6 +2,7 @@
 
 return [
     'enable' => true,
+    'logging' => true,
     'api_token_field' => 'api_token',
     'users' => [
         [

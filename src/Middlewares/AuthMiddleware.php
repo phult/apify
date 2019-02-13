@@ -38,6 +38,9 @@ class AuthMiddleware extends BaseController
     }
 
     public static function responseError ($msg) {
+        if (isset(static::$configs['logging']) && static::$configs['logging']) {
+            \Log::info($msg . " " .  $_SERVER["REMOTE_ADDR"] .  " " .  $_SERVER["REQUEST_URI"]);
+        }
         header('content-type: application/json');
         header('status: 403');
         print_r(json_encode(['status' => 'fail', 'message' => $msg]));
