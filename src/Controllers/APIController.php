@@ -161,8 +161,7 @@ class APIController extends BaseController
         if (is_array($files)) {
             $output = [];
             foreach($files as $file) {
-                $newFileName = time()."-".$file->getClientOriginalName();
-                $newFileName = strtolower($newFileName);
+                $newFileName = time()."-".$this->getSlug(preg_replace('/\\.[^.\\s]{3,4}$/', '', $file->getClientOriginalName())).".".$file->getClientOriginalExtension();
                 $file->move($directoryPath, $newFileName);
                 $fullRelativePath = $newFileName;
                 if ($customDirectoryPath) {
@@ -174,8 +173,7 @@ class APIController extends BaseController
 
         } else {
 
-            $newFileName = time()."-".$files->getClientOriginalName();
-            $newFileName = strtolower($newFileName);
+            $newFileName = time()."-".$this->getSlug(preg_replace('/\\.[^.\\s]{3,4}$/', '', $file->getClientOriginalName())).".".$file->getClientOriginalExtension();
             $files->move($directoryPath, $newFileName);
             $fullRelativePath = $newFileName;
             if ($customDirectoryPath) {
