@@ -142,10 +142,12 @@ class APIController extends BaseController
         return $this->success($response);
     }
 
-    public function upload(Request $request) {
+    public function upload(Request $request)
+    {
         $files = $request->file('file');
         $directoryPath = env('APIFY_UPLOAD_PATH', '/home/upload');
         $customDirectoryPath = $request->get('customDirectoryPath');
+        $ruleValidate = $request->get('ruleValidate', []);
         if (empty($files)) {
             $result = ["result" => "File required!"];
             return $this->error($result);
@@ -158,31 +160,84 @@ class APIController extends BaseController
             }
         }
 
+        //mutiple
         if (is_array($files)) {
             $output = [];
             foreach($files as $file) {
-                $newFileName = time()."-".$this->getSlug(preg_replace('/\\.[^.\\s]{3,4}$/', '', $file->getClientOriginalName())).".".$file->getClientOriginalExtension();
-                $file->move($directoryPath, $newFileName);
+                $validate = $this->validateUpload($ruleValidate, $file);
+                if($validate['status']) {
+                    $newFileName = time()."-".$this->getSlug(preg_replace('/\\.[^.\\s]{3,4}$/', '', $file->getClientOriginalName())).".".$file->getClientOriginalExtension();
+                    $file->move($directoryPath, $newFileName);
+                    $fullRelativePath = $newFileName;
+                    if ($customDirectoryPath) {
+                        $fullRelativePath = "/" . $customDirectoryPath . '/' . $newFileName;
+                    }
+                    array_push($output, $fullRelativePath);
+                } else {
+                    return $this->error($validate);
+                }
+            }
+            $result = ['result' => $output];
+        } else {
+            $validate = $this->validateUpload($ruleValidate, $files);
+            if($validate['status']) {
+                $newFileName = time()."-".$this->getSlug(preg_replace('/\\.[^.\\s]{3,4}$/', '', $files->getClientOriginalName())).".".$files->getClientOriginalExtension();
+                $files->move($directoryPath, $newFileName);
                 $fullRelativePath = $newFileName;
                 if ($customDirectoryPath) {
                     $fullRelativePath = "/" . $customDirectoryPath . '/' . $newFileName;
                 }
-                array_push($output, $fullRelativePath);
+                $result = ['result' => $fullRelativePath];
+            } else {
+                return $this->error($validate);
             }
-            $result = ['result' => $output];
-
-        } else {
-
-            $newFileName = time()."-".$this->getSlug(preg_replace('/\\.[^.\\s]{3,4}$/', '', $file->getClientOriginalName())).".".$file->getClientOriginalExtension();
-            $files->move($directoryPath, $newFileName);
-            $fullRelativePath = $newFileName;
-            if ($customDirectoryPath) {
-                $fullRelativePath = "/" . $customDirectoryPath . '/' . $newFileName;
-            }
-            $result = ['result' => $fullRelativePath];
-
         }
 
         return $this->success($result);
+    }
+
+    private function validateUpload($rule, $file) {
+        $retVal = ['status' => false];
+        if(!empty($rule['extensions']) && is_array($rule['extensions'])) {
+            if(!in_array(strtolower($file->getClientOriginalExtension()), $rule['extensions'])) {
+                $retVal['message'] = 'Extension not valid!';
+                return $retVal;
+            }
+        }
+        if(!empty($rule['maxSize']) && is_numeric($rule['maxSize'])) {
+            if(($file->getClientSize() / 1048576) > $rule['maxSize']) {
+                $retVal['message'] = 'File max size '.$rule['maxSize'].' MB!';
+                return $retVal;
+            }
+        }
+        if(!empty($rule['minWidth']) && is_numeric($rule['minWidth'])) {
+            list($width) = getimagesize($file);
+            if($width < $rule['minWidth']) {
+                $retVal['message'] = 'File min width '.$rule['minWidth'].'px!';
+                return $retVal;
+            }
+        }
+        if(!empty($rule['maxWidth']) && is_numeric($rule['maxWidth'])) {
+            list($width) = getimagesize($file);
+            if($width > $rule['maxWidth']) {
+                $retVal['message'] = 'File max width '.$rule['maxWidth'].'px!';
+                return $retVal;
+            }
+        }
+        if(!empty($rule['minHeight']) && is_numeric($rule['minHeight'])) {
+            list($height) = getimagesize($file);
+            if($height < $rule['minHeight']) {
+                $retVal['message'] = 'File min height '.$rule['minHeight'].'px!';
+                return $retVal;
+            }
+        }
+        if(!empty($rule['maxHeight']) && is_numeric($rule['maxHeight'])) {
+            list($height) = getimagesize($file);
+            if($height < $rule['maxHeight']) {
+                $retVal['message'] = 'File max height '.$rule['maxHeight'].'px!';
+                return $retVal;
+            }
+        }
+        return ['status' => true];
     }
 }
