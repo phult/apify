@@ -25,7 +25,9 @@ class EqBuilder extends FilterBuilder
             $query = $query->whereNull($filter['field']);
         } else {
             if (strrpos(strtolower($filter['field']), '.raw') > 0) {
-                $query = $query->whereRaw($filter['value']);
+                $query = $query->where(function ($query) use ($filter) {
+                    $query->whereRaw($filter['value']);
+                });
             } else {
                 $query = $query->where($filter['field'], '=', $filter['value']);
             }
