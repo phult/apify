@@ -35,21 +35,21 @@ if (method_exists($this->app, 'group')) {
         Route::get('{entity}', [
             'uses' => 'Megaads\Apify\Controllers\APIController@get',
         ]);
-        Route::get('{entity}/{id:[0-9]+}', [
+        Route::get('{entity}/{id}', [
             'uses' => 'Megaads\Apify\Controllers\APIController@show',
-        ]);
+        ])->where(['id' => '[0-9]+']);
         Route::post('{entity}', [
             'uses' => 'Megaads\Apify\Controllers\APIController@store',
         ]);
-        Route::put('{entity}/{id:[0-9]+}', [
+        Route::put('{entity}/{id}', [
             'uses' => 'Megaads\Apify\Controllers\APIController@update',
-        ]);
-        Route::patch('{entity}/{id:[0-9]+}', [
+        ])->where(['id' => '[0-9]+']);
+        Route::patch('{entity}/{id}', [
             'uses' => 'Megaads\Apify\Controllers\APIController@patch',
-        ]);
-        Route::delete('{entity}/{id:[0-9]+}', [
+        ])->where(['id' => '[0-9]+']);
+        Route::delete('{entity}/{id}', [
             'uses' => 'Megaads\Apify\Controllers\APIController@destroy',
-        ]);
+        ])->where(['id' => '[0-9]+']);
         Route::delete('{entity}', [
             'uses' => 'Megaads\Apify\Controllers\APIController@destroyBulk',
         ]);
