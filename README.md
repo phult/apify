@@ -16,9 +16,10 @@ It's always easy to customize to suit any need such as defining data relationshi
   * Metadata
 * Supports Event Bus
 
-Use HTTP clients like [Postman](https://www.getpostman.com/) to invoke RESTful API calls.
-
-Combine with [API Gateway](https://github.com/megaads-vn/api-gateway) is also recommended to build a completely development environment for microservice.
+## Using Apify
+- Apify client for PHP: https://github.com/megaads-vn/apify-client-php
+- Use HTTP clients like [Postman](https://www.getpostman.com/) to invoke RESTful API calls.
+- Combine with [API Gateway](https://github.com/megaads-vn/api-gateway) is also recommended to build a completely development environment for microservice.
 
 ## Installation
 
