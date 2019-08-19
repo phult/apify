@@ -5,7 +5,7 @@ use Megaads\Apify\FilterBuilders\FilterBuilder;
 
 class BwBuilder extends FilterBuilder
 {
-    const regex = '/(^[a-zA-Z0-9\.\_\-]+)\=\[([\d]+);([\d]+)\]/';
+    const regex = '/(^[a-zA-Z0-9\.\_\-]+)\=\[([\d\:\- ]+);([\d\:\- ]+)\]/';
     protected $level = 7;
     public function buildQueryParam($filterParam)
     {
