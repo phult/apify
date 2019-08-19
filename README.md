@@ -322,3 +322,5 @@ The Apify is open-sourced software licensed under the [MIT license](http://opens
 Email: phult.contact@gmail.com
 
 Skype: [phult.bk](skype:phult.bk?chat)
+
+If you find a bug, please report it [here on Github](https://github.com/megaads-vn/apify/issues).
