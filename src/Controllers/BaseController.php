@@ -189,7 +189,12 @@ class BaseController extends DynamicController
     {
         $tableAlias = $query->getModel()->getTable();
         foreach ($sorts as $column => $type) {
-            if (str_contains($column, '.')) {
+            if (preg_match("/^raw\(/", $column)) {
+                preg_match('/raw\((.+)\)/', $column, $matches);
+                if (count($matches) == 2) {
+                    $query = $query->orderByRaw(\DB::raw($matches[1]));
+                }
+            } else if (str_contains($column, '.')) {
                 $query = $query->orderBy($this->standardizedQueryAlias($query, $column), $type == 'desc' ? 'desc' : 'asc');
             } else {
                 $query = $query->orderBy(($tableAlias ? $tableAlias . '.' : '') . $column, $type == 'desc' ? 'desc' : 'asc');
@@ -214,7 +219,12 @@ class BaseController extends DynamicController
         $tableAlias = $query->getModel()->getTable();
         if ($selections != null && count($selections) > 0) {
             foreach ($selections as $selection) {
-                if (preg_match("/^count/", $selection)
+                if (preg_match("/^raw\(/", $selection)) {
+                    preg_match('/raw\((.+)\)/', $selection, $matches);
+                    if (count($matches) == 2) {
+                        $query = $query->addSelect(\DB::raw($matches[1]));
+                    }
+                } else if (preg_match("/^count/", $selection)
                     || preg_match("/^sum/", $selection)
                     || preg_match("/^max/", $selection)
                     || preg_match("/^min/", $selection)
