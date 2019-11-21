@@ -19,10 +19,14 @@ class AuthMiddleware extends BaseController
     public static function checkPermission ($entity, $permission) {
         if (static::$configs['enable']) {
             $allowPermissions = static::getPermissionsByEntity($entity);
+            if (in_array('deny', $allowPermissions)) {
+                static::responseError("Access denied!");
+            }
             $wildCastPermissions = static::getPermissionsByEntity('*');
             if (!(in_array($permission, $allowPermissions) || in_array($permission, $wildCastPermissions))) {
                 static::responseError("Access denied!");
             }
+
         }
     }
 
