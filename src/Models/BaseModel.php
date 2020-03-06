@@ -2,6 +2,8 @@
 namespace Megaads\Apify\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
 
 class BaseModel extends Model
 {
