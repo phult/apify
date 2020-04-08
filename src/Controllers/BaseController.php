@@ -66,6 +66,7 @@ class BaseController extends DynamicController
             'embeds' => [],
             'filters' => [],
             'groups' => [],
+            'embeds_fields' => [],
         ];
         // pagination
         if ($request->has('page_id')) {
@@ -79,7 +80,18 @@ class BaseController extends DynamicController
             $fields = explode(',', $request->input('fields'));
             foreach ($fields as $field) {
                 if ($field != null) {
-                    $retval['fields'][] = $field;
+                    $fieldExplode = explode('.', $field);
+                    if ($fieldExplode && count($fieldExplode) == 2) {
+                        $embedName = $fieldExplode[0];
+                        $col = $fieldExplode[1];
+                        if (!isset($retval['embeds_fields'][$embedName])) {
+                            $retval['embeds_fields'][$embedName] = [];
+                        }
+                        $retval['embeds_fields'][$embedName][] = $col;
+
+                    } else {
+                        $retval['fields'][] = $field;
+                    }
                 }
             }
         }
@@ -257,6 +269,37 @@ class BaseController extends DynamicController
             }
         }
         return $query;
+    }
+
+    public function decorEmbed($model, $params)
+    {
+        if (!array_key_exists('embeds', $params)
+            || !$params['embeds']) {
+            return $params;
+        }
+        $embeds = [];
+        $embedsFields = $params['embeds_fields'];
+        foreach ($params['embeds'] as $embed) {
+            $method = $embed . 'EmbedConfig';
+            $embedInfo = method_exists($model, $method) ? call_user_func([$model, $method]) : [];
+            $embedTable = isset($embedInfo['table']) ? $embedInfo['table'] : $embed;
+            $embedColumns = isset($embedInfo['columns']) ? $embedInfo['columns'] : [];
+            if ($embedInfo) {
+                if ($embedsFields && isset($embedsFields[$embed])) {
+                    $embedColumns = $embedsFields[$embed];
+                }
+                foreach ($embedColumns as &$column) {
+                    $column = $embedTable . '.' . $column;
+                }
+                $embeds[$embed] = function ($query) use ($embedColumns) {
+                    $query->get($embedColumns);
+                };
+            } else {
+                $embeds[] = $embed;
+            }
+        }
+        $params['embeds'] = $embeds;
+        return $params;
     }
 
     protected function buildEmbedQuery($query, $embeds)

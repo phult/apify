@@ -12,6 +12,7 @@ class APIController extends BaseController
         $response = [];
         $model = $this->getModel($entity);
         $queryParams = $this->buildQueryParams($request);
+        $queryParams = $this->decorEmbed($model, $queryParams);
         $model = $this->buildSelectionQuery($model, $queryParams['fields']);
         $model = $this->buildEmbedQuery($model, $queryParams['embeds']);
         $model = $this->buildSortQuery($model, $queryParams['sorts']);
@@ -32,10 +33,11 @@ class APIController extends BaseController
     public function show($entity, $id, Request $request)
     {
         \Megaads\Apify\Middlewares\AuthMiddleware::checkPermission($entity, "read");
-        $queryParams = $this->buildQueryParams($request, $entity);
         $model = $this->getModel($entity);
+        $queryParams = $this->buildQueryParams($request, $entity);
+        $queryParams = $this->decorEmbed($model, $queryParams);
         $model = $this->buildSelectionQuery($model, $queryParams['fields'], $entity);
-        $model = $this->buildEmbedQuery($model, $queryParams['embeds'], $entity);
+        $model = $this->buildEmbedQuery($model, $queryParams['embeds']);
         $result = $model->find($id);
         return $this->success([
             'result' => $result,
