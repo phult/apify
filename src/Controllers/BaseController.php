@@ -282,17 +282,19 @@ class BaseController extends DynamicController
         foreach ($params['embeds'] as $embed) {
             $method = $embed . 'EmbedConfig';
             $embedInfo = method_exists($model, $method) ? call_user_func([$model, $method]) : [];
-            $embedTable = isset($embedInfo['table']) ? $embedInfo['table'] : $embed;
-            $embedColumns = isset($embedInfo['columns']) ? $embedInfo['columns'] : [];
-            if ($embedInfo) {
-                if ($embedsFields && isset($embedsFields[$embed])) {
-                    $embedColumns = $embedsFields[$embed];
+            $embedTable = isset($embedInfo['table']) ? $embedInfo['table'] : '';
+            $embedColumns = isset($embedInfo['columns']) ? $embedInfo['columns'] : null;
+            if ($embedsFields && isset($embedsFields[$embed])) {
+                $embedColumns = $embedsFields[$embed];
+            }
+            if ($embedColumns) {
+                if ($embedTable) {
+                    foreach ($embedColumns as &$column) {
+                        $column = $embedTable . '.' . $column;
+                    }
                 }
-                foreach ($embedColumns as &$column) {
-                    $column = $embedTable . '.' . $column;
-                }
-                $embeds[$embed] = function ($query) use ($embedColumns) {
-                    $query->get($embedColumns);
+                $embeds[$embed] =  function ($query) use ($embedColumns) {
+                    $query->select($embedColumns);
                 };
             } else {
                 $embeds[] = $embed;
