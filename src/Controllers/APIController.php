@@ -147,10 +147,11 @@ class APIController extends BaseController
     public function upload(Request $request)
     {
         $files = $request->file('file');
+        $fileBase64 = $request->input('fileBase64');
         $directoryPath = env('APIFY_UPLOAD_PATH', '/home/upload');
         $customDirectoryPath = $request->get('customDirectoryPath');
         $ruleValidate = $request->get('ruleValidate', []);
-        if (empty($files)) {
+        if (empty($files) && empty($fileBase64)) {
             $result = ["result" => "File required!"];
             return $this->error($result);
         }
@@ -161,9 +162,23 @@ class APIController extends BaseController
                 mkdir($directoryPath, 0777, true);
             }
         }
+        if (!empty($fileBase64)) {
+            if (is_array($fileBase64)) {
+                $output = [];
+                foreach($fileBase64 as $file) {
+                    $path = $this->uploadBase64($file, $customDirectoryPath, $directoryPath);
+                    if (!empty($path)) {
+                        array_push($output, $path);
+                    }
+                    $result = ['result' => $output];
+                }
 
+            }else{
+                $path = $this->uploadBase64($fileBase64, $customDirectoryPath, $directoryPath);
+                $result = ['result' => $path];
+            }
+        }else if (is_array($files)) {
         //mutiple
-        if (is_array($files)) {
             $output = [];
             foreach($files as $file) {
                 $validate = $this->validateUpload($ruleValidate, $file);
@@ -241,5 +256,31 @@ class APIController extends BaseController
             }
         }
         return ['status' => true];
+    }
+
+    private function uploadBase64($file,$customDirectoryPath,$directoryPath){
+        $retVal = '';
+        $file = preg_replace('/^data:image\/\w+;base64,/', '', $file);
+        $file = str_replace(' ', '+', $file);
+        $image = base64_decode($file);
+        if (imagecreatefromstring(base64_decode($file)) !== false ) {
+            $f = finfo_open();
+            $type = finfo_buffer($f, $image, FILEINFO_MIME_TYPE);
+
+            if ($type) {
+                $type = explode('/', $type)[1];
+         }
+         $newFileName = substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil(10/strlen($x)) )),1,10) . time() . '.' . $type;
+         $fullRelativePath = $newFileName;
+         if ($customDirectoryPath) {
+            $fullRelativePath = "/" . $customDirectoryPath . '/' . $newFileName;
+        }
+        $isSuccess = file_put_contents($directoryPath.$fullRelativePath, $image);
+        if ($isSuccess) {
+            $retVal = $fullRelativePath;
+        }
+    }
+
+    return $retVal;
     }
 }
