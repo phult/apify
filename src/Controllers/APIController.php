@@ -149,6 +149,7 @@ class APIController extends BaseController
         $files = $request->file('file');
         $fileBase64 = $request->input('fileBase64');
         $directoryPath = env('APIFY_UPLOAD_PATH', '/home/upload');
+        $customFileName = $request->get('customFileName');
         $customDirectoryPath = $request->get('customDirectoryPath');
         $ruleValidate = $request->get('ruleValidate', []);
         if (empty($files) && empty($fileBase64)) {
@@ -166,7 +167,7 @@ class APIController extends BaseController
             if (is_array($fileBase64)) {
                 $output = [];
                 foreach($fileBase64 as $file) {
-                    $path = $this->uploadBase64($file, $customDirectoryPath, $directoryPath);
+                    $path = $this->uploadBase64($file, $customDirectoryPath, $directoryPath, $customFileName);
                     if (!empty($path)) {
                         array_push($output, $path);
                     }
@@ -174,7 +175,7 @@ class APIController extends BaseController
                 }
 
             }else{
-                $path = $this->uploadBase64($fileBase64, $customDirectoryPath, $directoryPath);
+                $path = $this->uploadBase64($fileBase64, $customDirectoryPath, $directoryPath, $customFileName);
                 $result = ['result' => $path];
             }
         }else if (is_array($files)) {
@@ -258,7 +259,7 @@ class APIController extends BaseController
         return ['status' => true];
     }
 
-    private function uploadBase64($file,$customDirectoryPath,$directoryPath){
+    private function uploadBase64($file, $customDirectoryPath, $directoryPath, $customFileName){
         $retVal = '';
         $file = preg_replace('/^data:image\/\w+;base64,/', '', $file);
         $file = str_replace(' ', '+', $file);
@@ -270,7 +271,11 @@ class APIController extends BaseController
             if ($type) {
                 $type = explode('/', $type)[1];
          }
-         $newFileName = substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil(10/strlen($x)) )),1,10) . time() . '.' . $type;
+         if (!empty($customFileName)) {
+             $newFileName = $customFileName . '-'. time() . '.' . $type;
+         }else{
+            $newFileName = substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil(10/strlen($x)) )),1,10) . time() . '.' . $type;
+         }
          $fullRelativePath = $newFileName;
          if ($customDirectoryPath) {
             $fullRelativePath = "/" . $customDirectoryPath . '/' . $newFileName;
