@@ -280,6 +280,10 @@ class APIController extends BaseController
          if ($customDirectoryPath) {
             $fullRelativePath = "/" . $customDirectoryPath . '/' . $newFileName;
         }
+        preg_match('/\/$/', $directoryPath,$matches);
+        if (empty($matches)) {
+            $directoryPath = $directoryPath . '/';
+        }
         $isSuccess = file_put_contents($directoryPath.$fullRelativePath, $image);
         if ($isSuccess) {
             $retVal = $fullRelativePath;
