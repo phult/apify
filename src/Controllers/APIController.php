@@ -61,6 +61,8 @@ class APIController extends BaseController
                     }
                     \DB::commit();
                 } catch (\Exception $exc) {
+                    \Log::info('input: ' . json_encode($input));
+                    \Log::error($exc);
                     $status = "fail";
                     $result = $exc->getMessage();
                     \DB::rollback();
@@ -69,6 +71,8 @@ class APIController extends BaseController
                 $result = $model->create($inputs);
             }
         } catch (\Exception $exc) {
+            \Log::info('input: ' . json_encode($inputs));
+            \Log::error($exc);
             $status = "fail";
             $result = $exc->getMessage();
         }
