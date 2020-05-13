@@ -171,7 +171,7 @@ class APIController extends BaseController
             if (is_array($fileBase64)) {
                 $output = [];
                 foreach($fileBase64 as $file) {
-                    $path = $this->uploadBase64($file, $customDirectoryPath, $directoryPath, $customFileName);
+                    $path = $this->uploadBase64($file, $customDirectoryPath, $customFileName);
                     if (!empty($path)) {
                         array_push($output, $path);
                     }
@@ -179,7 +179,7 @@ class APIController extends BaseController
                 }
 
             }else{
-                $path = $this->uploadBase64($fileBase64, $customDirectoryPath, $directoryPath, $customFileName);
+                $path = $this->uploadBase64($fileBase64, $customDirectoryPath, $customFileName);
                 $result = ['result' => $path];
             }
         }else if (is_array($files)) {
@@ -263,7 +263,8 @@ class APIController extends BaseController
         return ['status' => true];
     }
 
-    private function uploadBase64($file, $customDirectoryPath, $directoryPath, $customFileName){
+    private function uploadBase64($file, $customDirectoryPath, $customFileName){
+        $directoryPath = env('APIFY_UPLOAD_PATH', '/home/upload');
         $retVal = '';
         $file = preg_replace('/^data:image\/\w+;base64,/', '', $file);
         $file = str_replace(' ', '+', $file);
