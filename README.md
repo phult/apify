@@ -309,6 +309,7 @@ Is being updated ...
 | APIFY_MQ_PORT         |                   | Message queue server port                                 |
 | APIFY_MQ_USERNAME         |                   | Message queue authentication - username                                |
 | APIFY_MQ_PASSWORD         |                   | Message queue authentication - password                                 |                                 |
+| APIFY_MQ_EXCHANGE         | `apify`                  | Message queue exchange name                                 |
 
 ## Authenticate Apify & authorize Apify?
 
